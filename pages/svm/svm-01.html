@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SVM 01 — What SVM is (and why it exists)</title>
+  <meta name="description" content="Space Vector Modulation: representing inverter switching as vectors in the αβ plane." />
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/">Pieces of Knowledge</a>
+      <nav class="nav">
+        <a href="/pages/fundamentals/index.html">Fundamentals</a>
+        <a href="/pages/foc/index.html">FOC</a>
+        <a href="/pages/svm/index.html">SVM</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page">
+    <div class="breadcrumb"><a href="/">Home</a> → <a href="/pages/svm/index.html">SVM</a> → SVM 01</div>
+    <h1>SVM 01 — What is Space Vector Modulation?</h1>
+    <p class="sub">Goal: synthesize a desired voltage vector using inverter switching states efficiently.</p>
+
+    <div class="toc">
+      <strong>On this page</strong>
+      <a href="#idea">1) The idea</a>
+      <a href="#preview">2) Hexagon preview</a>
+      <a href="#next">Next</a>
+    </div>
+
+    <section id="idea" class="section">
+      <h2>The idea</h2>
+      <p>
+        A 3-phase inverter has discrete switching states. Each state corresponds to a voltage vector in the αβ plane.
+        SVM chooses a sequence of states (and durations) so that the average voltage equals your desired vector.
+      </p>
+    </section>
+
+    <section id="preview" class="section">
+      <h2>Hexagon preview</h2>
+
+      <div class="widget" id="svmWidget">
+        <div class="widget-head">
+          <h3 class="widget-title">SVM hexagon</h3>
+          <p class="widget-note">Phase 1 preview. We’ll add sector detection + T1/T2/T0 soon.</p>
+        </div>
+
+        <canvas width="640" height="420" aria-label="SVM hexagon"></canvas>
+
+        <div class="controls">
+          <div class="control">
+            <label>Vector angle</label>
+            <input type="range" min="0" max="360" value="15" data-angle />
+            <div class="readout" data-readout>—</div>
+          </div>
+
+          <div class="control">
+            <label>Vector magnitude (0–1)</label>
+            <input type="range" min="0" max="100" value="60" data-mag />
+            <div class="readout">We’ll connect this to PWM timings in SVM 02/03.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="next" class="section">
+      <h2>Next</h2>
+      <div class="nav-bottom">
+        <a href="/pages/svm/index.html">← Back to SVM index</a>
+        <a href="/pages/foc/foc-01.html">Go to FOC 01 →</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Comments</h2>
+      <div id="comments-embed"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© <span id="year"></span> Pieces of Knowledge</p></div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+  <script type="module">
+    import { mountSvmHexagon } from "/js/widgets/svm-hexagon.js";
+    mountSvmHexagon("svmWidget");
+  </script>
+</body>
+</html>

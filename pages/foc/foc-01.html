@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FOC 01 — What problem does FOC actually solve?</title>
+  <meta name="description" content="FOC solves complexity by moving into a rotating reference frame (dq) to control torque and flux cleanly." />
+
+  <!-- IMPORTANT: relative-to-this-file path (pages/foc/ -> go up twice) -->
+  <link rel="stylesheet" href="../../css/main.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <!-- from pages/foc/ -> up twice to site root -->
+      <a class="brand" href="../../">Pieces of Knowledge</a>
+      <nav class="nav">
+        <a href="../fundamentals/index.html">Fundamentals</a>
+        <a href="../foc/index.html">FOC</a>
+        <a href="../svm/index.html">SVM</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page">
+    <div class="breadcrumb">
+      <a href="../../">Home</a> → <a href="../foc/index.html">FOC</a> → FOC 01
+    </div>
+
+    <h1>FOC 01 — What problem does FOC actually solve?</h1>
+    <p class="sub">Goal: make a 3-phase motor “feel” like two simple control channels: flux (Id) and torque (Iq).</p>
+
+    <div class="toc">
+      <strong>On this page</strong>
+      <a href="#problem">1) The real problem</a>
+      <a href="#idea">2) The core idea</a>
+      <a href="#widgets">3) Interactive intuition</a>
+      <a href="#next">Next</a>
+    </div>
+
+    <section id="problem" class="section">
+      <h2>The real problem</h2>
+      <p>
+        In three-phase (abc), everything is rotating and time-varying. Torque and flux are coupled.
+        FOC changes the viewpoint: transform signals into a rotating frame (dq) aligned to the rotor field,
+        so control becomes clean and almost “DC-like”.
+      </p>
+    </section>
+
+    <section id="idea" class="section">
+      <h2>The core idea</h2>
+      <p>
+        Think in two axes:
+        <strong>d</strong> (field axis) and <strong>q</strong> (torque axis).
+        If the frame rotates with the rotor, the important quantities become near-constant,
+        and simple PI controllers work well.
+      </p>
+    </section>
+
+    <section id="widgets" class="section">
+      <h2>Interactive intuition</h2>
+
+      <div class="widget" id="focWidget">
+        <div class="widget-head">
+          <h3 class="widget-title">dq → αβ rotation (intuition)</h3>
+          <p class="widget-note">Move θ and Id/Iq. See how the vector changes when rotated.</p>
+        </div>
+
+        <canvas width="640" height="420" aria-label="FOC dq viewer"></canvas>
+
+        <div class="controls">
+          <div class="control">
+            <label>θ (electrical angle)</label>
+            <input type="range" min="0" max="360" value="25" data-theta />
+            <div class="readout" data-readout></div>
+          </div>
+
+          <div class="control">
+            <label>Id (flux) — normalized</label>
+            <input type="range" min="-100" max="100" value="50" data-id />
+            <div class="readout">Tip: later we’ll explain why Id is often near 0 for PMSM.</div>
+          </div>
+
+          <div class="control">
+            <label>Iq (torque) — normalized</label>
+            <input type="range" min="-100" max="100" value="60" data-iq />
+            <div class="readout">Torque ~ Iq (simplified intuition).</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="widget" id="svmWidget">
+        <div class="widget-head">
+          <h3 class="widget-title">SVM hexagon (preview)</h3>
+          <p class="widget-note">For now use sliders. Later we’ll compute sector + T1/T2/T0.</p>
+        </div>
+
+        <canvas width="640" height="420" aria-label="SVM hexagon"></canvas>
+
+        <div class="controls">
+          <div class="control">
+            <label>Vector angle</label>
+            <input type="range" min="0" max="360" value="40" data-angle />
+            <div class="readout" data-readout>—</div>
+          </div>
+
+          <div class="control">
+            <label>Vector magnitude (0–1)</label>
+            <input type="range" min="0" max="100" value="75" data-mag />
+            <div class="readout">We’ll compute T1/T2/T0 in SVM 02/03.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="next" class="section">
+      <h2>Next</h2>
+      <p>Next page: Clarke transform (abc → αβ). This is where the math becomes “friendly”.</p>
+      <div class="nav-bottom">
+        <a href="../foc/index.html">← Back to FOC index</a>
+        <a href="../svm/svm-01.html">Go to SVM 01 →</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Comments</h2>
+      <div id="comments-embed"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© <span id="year"></span> Pieces of Knowledge</p></div>
+  </footer>
+
+  <!-- IMPORTANT: relative-to-this-file paths -->
+  <script src="../../js/main.js"></script>
+
+  <!-- Widgets (ES Modules) -->
+  <script type="module">
+    import { mountFocDqViewer } from "../../js/widgets/foc-dq-viewer.js";
+    import { mountSvmHexagon } from "../../js/widgets/svm-hexagon.js";
+
+    mountFocDqViewer("focWidget");
+    mountSvmHexagon("svmWidget");
+  </script>
+</body>
+</html>
