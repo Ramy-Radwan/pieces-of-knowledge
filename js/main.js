@@ -28,6 +28,10 @@
       const el = document.getElementById(item.id);
       if (!el) continue;
 
+      // Show shimmer while loading
+      el.innerHTML =
+        '<div class="embed-loading" aria-label="Loading content" role="status"></div>';
+
       const url = `${basePath}${item.path}`;
 
       try {

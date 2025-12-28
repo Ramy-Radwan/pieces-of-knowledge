@@ -141,3 +141,22 @@ a:hover{text-decoration:underline}
   padding: 18px 0 40px;
   color: var(--muted);
 }
+
+/* Embed loading shimmer (skeleton) */
+.embed-loading {
+  height: 88px;                 /* good default */
+  border-radius: 12px;
+  background: linear-gradient(
+    90deg,
+    #1a2230 25%,
+    #222c3c 37%,
+    #1a2230 63%
+  );
+  background-size: 400% 100%;
+  animation: embed-shimmer 1.4s ease infinite;
+}
+
+@keyframes embed-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
