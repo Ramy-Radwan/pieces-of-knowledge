@@ -24,4 +24,66 @@ export function mountSvmHexagon(rootId) {
 
     ctx.clearRect(0, 0, W, H);
 
-    con
+    // Colors (dark theme safe)
+    const colorGrid = "rgba(183,195,214,0.45)";
+    const colorActive = "rgba(183,195,214,0.35)";
+    const colorResult = "rgba(124,192,255,0.95)";
+
+    // Hexagon (SVM boundary)
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const a = degToRad(60 * i - 90);
+      const x = center.x + R * Math.cos(a);
+      const y = center.y + R * Math.sin(a);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = colorGrid;
+    ctx.stroke();
+
+    // Active vectors (6)
+    ctx.strokeStyle = colorActive;
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 6; i++) {
+      const a = degToRad(60 * i - 90);
+      const x = center.x + R * Math.cos(a);
+      const y = center.y + R * Math.sin(a);
+      ctx.beginPath();
+      ctx.moveTo(center.x, center.y);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
+
+    // Resultant vector
+    const base = vec(R * m, 0);
+    const v = rotate(base, degToRad(angleDeg - 90));
+
+    ctx.beginPath();
+    ctx.moveTo(center.x, center.y);
+    ctx.lineTo(center.x + v.x, center.y + v.y);
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = colorResult;
+    ctx.stroke();
+
+    // Dot at tip
+    ctx.beginPath();
+    ctx.arc(center.x + v.x, center.y + v.y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = colorResult;
+    ctx.fill();
+  }
+
+  function update() {
+    const angleDeg = Number(angleSlider.value);
+    const m = Number(magSlider.value) / 100;
+    draw(angleDeg, m);
+    readout.textContent =
+      `angle=${angleDeg}°, magnitude=${m.toFixed(2)} (normalized)`;
+  }
+
+  angleSlider.addEventListener("input", update);
+  magSlider.addEventListener("input", update);
+
+  update();
+}

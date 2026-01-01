@@ -16,8 +16,6 @@ export function mountFocDqViewer(rootId) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
-
-
   function drawAxes(center, R) {
     ctx.save();
     ctx.strokeStyle = "rgba(183,195,214,0.45)";
@@ -50,4 +48,43 @@ export function mountFocDqViewer(rootId) {
     drawAxes(center, R);
 
     // dq vector in dq frame: d along +x, q along +y
-    // Canvas y is
+    // Canvas y is inverted
+    const dq = vec((id / 100) * R, -(iq / 100) * R);
+
+    // rotate dq into alpha-beta (conceptually inverse Park)
+    const ab = rotate(dq, degToRad(thetaDeg));
+
+    // Draw dq vector
+    ctx.beginPath();
+    ctx.moveTo(center.x, center.y);
+    ctx.lineTo(center.x + dq.x, center.y + dq.y);
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = colorDQ;
+    ctx.stroke();
+
+    // Draw alpha-beta vector
+    ctx.beginPath();
+    ctx.moveTo(center.x, center.y);
+    ctx.lineTo(center.x + ab.x, center.y + ab.y);
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = colorAB;
+    ctx.stroke();
+
+    readout.textContent =
+      `theta=${thetaDeg}°, Id=${(id / 100).toFixed(2)}, ` +
+      `Iq=${(iq / 100).toFixed(2)} (normalized)`;
+  }
+
+  function update() {
+    const thetaDeg = Number(thetaSlider.value);
+    const id = Number(idSlider.value);
+    const iq = Number(iqSlider.value);
+    draw(thetaDeg, id, iq);
+  }
+
+  thetaSlider.addEventListener("input", update);
+  idSlider.addEventListener("input", update);
+  iqSlider.addEventListener("input", update);
+
+  update();
+}
