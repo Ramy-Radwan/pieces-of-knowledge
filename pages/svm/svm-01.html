@@ -29,7 +29,7 @@
     <h1>SVM 01 — What is Space Vector Modulation?</h1>
 
     <p class="sub">
-      Space Vector Modulation (SVM) is the method that allows modern inverters
+      Space Vector Modulation (SVM) is the method used in motor-drive inverters
       to produce smooth, efficient motor currents using only simple ON/OFF switches.
     </p>
 
@@ -45,26 +45,26 @@
       <h2>The core idea</h2>
 
       <p>
-        A 3-phase inverter can only switch its transistors fully ON or fully OFF.
-        Because of this, it cannot directly generate an arbitrary voltage.
+        A 3-phase inverter used in motor drives can only switch its transistors
+        fully ON or fully OFF. Because of this hardware limitation, it cannot
+        directly generate an arbitrary voltage.
       </p>
 
       <p>
-        Space Vector Modulation solves this limitation by rapidly switching
-        between a small number of valid inverter states.
-        When these states are applied for carefully chosen durations,
-        the inverter behaves <em>on average</em> as if it produced the voltage you want.
+        Space Vector Modulation works within this limitation by switching between
+        a small number of <strong>valid inverter states defined by the hardware</strong>.
       </p>
 
       <p>
-        To reason about this cleanly, we represent each switching state
-        as a vector in a two-dimensional plane called the <strong>αβ plane</strong>.
+        To reason about these states clearly, we represent each one as a vector
+        in a two-dimensional plane called the <strong>αβ plane</strong>.
       </p>
 
       <p class="note">
         If you have seen the Clarke transformation before, the αβ plane will look familiar.
         If not, don’t worry — for now, think of it simply as a 2D diagram used
         to visualize three-phase voltages.
+        You do not need to derive or calculate anything in the αβ plane yet.
       </p>
     </section>
 
@@ -72,14 +72,19 @@
       <h2>Visual preview</h2>
 
       <p>
-        Before going into timing, PWM, or equations, let’s look at the geometric idea.
+        Before going into timing, PWM, or equations, let’s look only at the geometry.
       </p>
 
       <p>
         <strong>How to read this diagram (for now):</strong><br />
-        – The hexagon represents all voltage vectors the inverter can physically produce.<br />
-        – The arrow represents the voltage vector we want.<br />
-        – Ignore switching times and PWM details — just observe the geometry.
+        – The hexagon shows the voltage limits imposed by the inverter’s switching hardware.<br />
+        – The arrow shows the voltage vector we want the motor to see.<br />
+        – For now, focus only on where the arrow lies inside the hexagon.
+      </p>
+
+      <p class="note">
+        The hexagonal shape comes directly from the inverter’s switching limits.
+        We will explain why it is a hexagon later.
       </p>
 
       <div class="widget" id="svmWidget">
@@ -97,7 +102,8 @@
             <label>Vector angle</label>
             <input type="range" min="0" max="360" value="15" data-angle />
             <div class="readout" data-readout>
-              Changing this rotates the desired voltage vector electrically.
+              Changing this rotates the desired voltage vector electrically
+              (not the mechanical rotor position).
             </div>
           </div>
 
@@ -122,8 +128,8 @@
       </ul>
 
       <p>
-        This page is only about understanding the <strong>geometric idea</strong>.
-        The math will come later, step by step.
+        This page is only about understanding the <strong>geometric picture</strong>.
+        How this vector is actually produced in time will come later.
       </p>
     </section>
 
@@ -131,9 +137,14 @@
       <h2>Next</h2>
 
       <p>
-        In the next article, we’ll see how a desired vector inside the hexagon
-        is created using exactly two active vectors and one zero vector
-        within a single PWM cycle.
+        At this point, your goal is simply to recognize the SVM hexagon
+        and understand that desired voltages must stay within
+        the limits imposed by the inverter.
+      </p>
+
+      <p>
+        In the next article, we’ll show how this desired vector
+        is actually created in time using switching states.
       </p>
 
       <div class="nav-bottom">
@@ -141,8 +152,6 @@
         <a href="/pieces-of-knowledge/pages/foc/foc-01.html">Go to FOC 01 →</a>
       </div>
     </section>
-
-
 
     <section class="section">
       <h2>Comments</h2>
