@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SVM 01 — What SVM is (and why it exists)</title>
-  <meta name="description" content="Space Vector Modulation: representing inverter switching as vectors in the αβ plane." />
+  <meta name="description" content="Space Vector Modulation (SVM): a step-by-step geometric introduction using the αβ plane and the SVM hexagon." />
   <link rel="stylesheet" href="/pieces-of-knowledge/css/main.css" />
 </head>
 <body>
@@ -29,47 +29,76 @@
     <h1>SVM 01 — What is Space Vector Modulation?</h1>
 
     <p class="sub">
-      Space Vector Modulation (SVM) is the method used in motor-drive inverters
-      to produce smooth, efficient motor currents using only simple ON/OFF switches.
+      Motor control starts with three-phase electrical quantities produced by an inverter and consumed by a motor.
+      To understand and control them, we represent these quantities geometrically as vectors in simple coordinate systems.
+      From this foundation, techniques like SVM and FOC build higher-level behavior.
+    </p>
+
+    <p>
+      Space Vector Modulation (SVM) is the method used in motor-drive inverters to create a desired three-phase voltage
+      by intelligently switching between the inverter’s limited hardware states over time.
+      In practice, this reduces current ripple and torque ripple, and typically improves DC-bus usage compared to simpler modulation.
     </p>
 
     <div class="toc">
       <strong>On this page</strong>
-      <a href="#idea">1) The core idea</a>
-      <a href="#preview">2) Visual preview</a>
+      <a href="#idea">1) The core idea (step by step)</a>
+      <a href="#ab">2) The αβ plane (our shared picture)</a>
+      <a href="#preview">3) Geometric picture (SVM hexagon)</a>
       <a href="#limits">What we are NOT doing yet</a>
       <a href="#next">Next</a>
     </div>
 
     <section id="idea" class="section">
-      <h2>The core idea</h2>
+      <h2>The core idea (step by step)</h2>
 
       <p>
-        A 3-phase inverter used in motor drives can only switch its transistors
-        fully ON or fully OFF. Because of this hardware limitation, it cannot
-        directly generate an arbitrary voltage.
+        A 3-phase inverter used in motor drives can only switch its transistors fully ON or fully OFF.
+        Because of this hardware limitation, it cannot directly generate an arbitrary voltage.
+      </p>
+
+      <div class="note">
+        <strong>Think of SVM as a simple 3-step ladder:</strong>
+        <ol>
+          <li><strong>Hardware:</strong> the inverter can only do ON/OFF switching.</li>
+          <li><strong>Limits:</strong> those ON/OFF combinations create only a limited set of voltage possibilities.</li>
+          <li><strong>Strategy:</strong> SVM decides how to switch over time to approximate the voltage we want (we’ll do this later).</li>
+        </ol>
+      </div>
+
+      <p>
+        In other words, SVM works within the inverter’s constraints by choosing a sequence of
+        <strong>valid inverter states defined by the hardware</strong>.
+      </p>
+    </section>
+
+    <section id="ab" class="section">
+      <h2>The αβ plane (our shared picture)</h2>
+
+      <p>
+        Instead of thinking in three separate phase waveforms (A, B, C), we use a single 2D picture that is easier to reason about.
       </p>
 
       <p>
-        Space Vector Modulation works within this limitation by switching between
-        a small number of <strong>valid inverter states defined by the hardware</strong>.
+        <strong>The αβ plane</strong> is simply a 2D way to represent three-phase electrical quantities as a single rotating vector,
+        making them easier to visualize and reason about.
       </p>
 
-      <p>
-        To reason about these states clearly, we represent each one as a vector
-        in a two-dimensional plane called the <strong>αβ plane</strong>.
+      <p class="note">
+        You can also think of it this way:
+        the αβ plane is a 2D coordinate system that represents three-phase electrical quantities as a single vector,
+        providing a clean geometric view of their behavior.
       </p>
 
       <p class="note">
         If you have seen the Clarke transformation before, the αβ plane will look familiar.
-        If not, don’t worry — for now, think of it simply as a 2D diagram used
-        to visualize three-phase voltages.
-        You do not need to derive or calculate anything in the αβ plane yet.
+        If not, don’t worry — you do not need to derive or calculate anything in the αβ plane yet.
+        We are only using it as a visualization tool.
       </p>
     </section>
 
     <section id="preview" class="section">
-      <h2>Visual preview</h2>
+      <h2>Geometric picture (SVM hexagon)</h2>
 
       <p>
         Before going into timing, PWM, or equations, let’s look only at the geometry.
@@ -83,8 +112,14 @@
       </p>
 
       <p class="note">
-        The hexagonal shape comes directly from the inverter’s switching limits.
-        We will explain why it is a hexagon later.
+        This hexagon comes from the inverter’s discrete switching states; later we’ll show the exact states that form its corners.
+        The hexagonal shape comes directly from the inverter’s switching limits — we’ll explain why it is a hexagon later.
+      </p>
+
+      <p>
+        <strong>Mini-experiment:</strong>
+        Try increasing the magnitude until the arrow touches the hexagon boundary.
+        That boundary is the maximum voltage the inverter can synthesize in this normalized picture.
       </p>
 
       <div class="widget" id="svmWidget">
@@ -112,6 +147,7 @@
             <input type="range" min="0" max="100" value="60" data-mag />
             <div class="readout">
               This represents how “strong” the voltage is relative to the DC bus.
+              <strong>1 means “as large as the inverter can produce”</strong> in this normalized picture.
             </div>
           </div>
         </div>
@@ -129,7 +165,7 @@
 
       <p>
         This page is only about understanding the <strong>geometric picture</strong>.
-        How this vector is actually produced in time will come later.
+        How the inverter creates the desired vector over time will come next.
       </p>
     </section>
 
@@ -137,14 +173,12 @@
       <h2>Next</h2>
 
       <p>
-        At this point, your goal is simply to recognize the SVM hexagon
-        and understand that desired voltages must stay within
+        At this point, your goal is simply to recognize the SVM hexagon and understand that desired voltages must stay within
         the limits imposed by the inverter.
       </p>
 
       <p>
-        In the next article, we’ll show how this desired vector
-        is actually created in time using switching states.
+        In the next article, you will see the two nearest hexagon corner vectors and how mixing them over time creates the arrow.
       </p>
 
       <div class="nav-bottom">
