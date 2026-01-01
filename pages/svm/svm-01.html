@@ -27,30 +27,67 @@
     </div>
 
     <h1>SVM 01 — What is Space Vector Modulation?</h1>
-    <p class="sub">Goal: synthesize a desired voltage vector using inverter switching states efficiently.</p>
+
+    <p class="sub">
+      Space Vector Modulation (SVM) is the method that allows modern inverters
+      to produce smooth, efficient motor currents using only simple ON/OFF switches.
+    </p>
 
     <div class="toc">
       <strong>On this page</strong>
-      <a href="#idea">1) The idea</a>
-      <a href="#preview">2) Hexagon preview</a>
+      <a href="#idea">1) The core idea</a>
+      <a href="#preview">2) Visual preview</a>
+      <a href="#limits">What we are NOT doing yet</a>
       <a href="#next">Next</a>
     </div>
 
     <section id="idea" class="section">
-      <h2>The idea</h2>
+      <h2>The core idea</h2>
+
       <p>
-        A 3-phase inverter has discrete switching states. Each state corresponds to a voltage vector in the αβ plane.
-        SVM chooses a sequence of states (and durations) so that the average voltage equals your desired vector.
+        A 3-phase inverter can only switch its transistors fully ON or fully OFF.
+        Because of this, it cannot directly generate an arbitrary voltage.
+      </p>
+
+      <p>
+        Space Vector Modulation solves this limitation by rapidly switching
+        between a small number of valid inverter states.
+        When these states are applied for carefully chosen durations,
+        the inverter behaves <em>on average</em> as if it produced the voltage you want.
+      </p>
+
+      <p>
+        To reason about this cleanly, we represent each switching state
+        as a vector in a two-dimensional plane called the <strong>αβ plane</strong>.
+      </p>
+
+      <p class="note">
+        If you have seen the Clarke transformation before, the αβ plane will look familiar.
+        If not, don’t worry — for now, think of it simply as a 2D diagram used
+        to visualize three-phase voltages.
       </p>
     </section>
 
     <section id="preview" class="section">
-      <h2>Hexagon preview</h2>
+      <h2>Visual preview</h2>
+
+      <p>
+        Before going into timing, PWM, or equations, let’s look at the geometric idea.
+      </p>
+
+      <p>
+        <strong>How to read this diagram (for now):</strong><br />
+        – The hexagon represents all voltage vectors the inverter can physically produce.<br />
+        – The arrow represents the voltage vector we want.<br />
+        – Ignore switching times and PWM details — just observe the geometry.
+      </p>
 
       <div class="widget" id="svmWidget">
         <div class="widget-head">
           <h3 class="widget-title">SVM hexagon</h3>
-          <p class="widget-note">Phase 1 preview. We’ll add sector detection + T1/T2/T0 soon.</p>
+          <p class="widget-note">
+            Preview only. Sector detection and T1/T2/T0 come later.
+          </p>
         </div>
 
         <canvas width="640" height="420" aria-label="SVM hexagon"></canvas>
@@ -59,25 +96,53 @@
           <div class="control">
             <label>Vector angle</label>
             <input type="range" min="0" max="360" value="15" data-angle />
-            <div class="readout" data-readout>—</div>
+            <div class="readout" data-readout>
+              Changing this rotates the desired voltage vector electrically.
+            </div>
           </div>
 
           <div class="control">
             <label>Vector magnitude (0–1)</label>
             <input type="range" min="0" max="100" value="60" data-mag />
-            <div class="readout">We’ll connect this to PWM timings in SVM 02/03.</div>
+            <div class="readout">
+              This represents how “strong” the voltage is relative to the DC bus.
+            </div>
           </div>
         </div>
       </div>
     </section>
 
+    <section id="limits" class="section">
+      <h2>What we are NOT doing yet</h2>
+
+      <ul>
+        <li>No PWM timing equations</li>
+        <li>No sector math</li>
+        <li>No duty-cycle calculations</li>
+      </ul>
+
+      <p>
+        This page is only about understanding the <strong>geometric idea</strong>.
+        The math will come later, step by step.
+      </p>
+    </section>
+
     <section id="next" class="section">
       <h2>Next</h2>
+
+      <p>
+        In the next article, we’ll see how a desired vector inside the hexagon
+        is created using exactly two active vectors and one zero vector
+        within a single PWM cycle.
+      </p>
+
       <div class="nav-bottom">
         <a href="/pieces-of-knowledge/pages/svm/index.html">← Back to SVM index</a>
         <a href="/pieces-of-knowledge/pages/foc/foc-01.html">Go to FOC 01 →</a>
       </div>
     </section>
+
+
 
     <section class="section">
       <h2>Comments</h2>
