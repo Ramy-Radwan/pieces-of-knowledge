@@ -34,46 +34,120 @@
       From this foundation, techniques like SVM and FOC build higher-level behavior.
     </p>
 
+    <div class="note">
+      <strong>10-second box: What is an inverter?</strong><br />
+      An inverter is the power stage that takes DC electricity (from a battery or DC bus) and produces
+      controlled three-phase electricity for a motor using very fast ON/OFF electronic switches.
+    </div>
+
     <p>
-      Space Vector Modulation (SVM) is the method used in motor-drive inverters to create a desired three-phase voltage
-      by intelligently switching between the inverter’s limited hardware states over time.
+      Space Vector Modulation (SVM) is a method that helps an inverter produce the three-phase voltage we want,
+      even though the inverter is built from simple ON/OFF switches.
       In practice, this reduces current ripple and torque ripple, and typically improves DC-bus usage compared to simpler modulation.
     </p>
 
     <div class="toc">
       <strong>On this page</strong>
+      <a href="#inverter">0) Inverter basics (why 6 switches?)</a>
       <a href="#idea">1) The core idea (step by step)</a>
       <a href="#ab">2) The αβ plane (our shared picture)</a>
-      <a href="#preview">3) Geometric picture (SVM hexagon)</a>
+      <a href="#preview">3) From inverter switches → SVM hexagon (visual)</a>
       <a href="#limits">What we are NOT doing yet</a>
       <a href="#next">Next</a>
     </div>
 
-    <section id="idea" class="section">
-      <h2>The core idea (step by step)</h2>
+    <section id="inverter" class="section">
+      <h2>0) Inverter basics (why 6 switches?)</h2>
 
       <p>
-        A 3-phase inverter used in motor drives can only switch its transistors fully ON or fully OFF.
-        Because of this hardware limitation, it cannot directly generate an arbitrary voltage.
+        In motor control, the “inverter” is the hardware that sits between a DC source and the motor:
+      </p>
+
+      <div class="note">
+        <strong>DC source</strong> (battery / DC bus) → <strong>inverter</strong> → <strong>3 motor phases</strong> (A, B, C)
+      </div>
+
+      <p>
+        The important part is this:
+        an inverter does not directly “generate smooth sine waves.”
+        It is built from electronic switches (transistors), and each switch can only do two things:
+        <strong>ON</strong> or <strong>OFF</strong>.
+      </p>
+
+      <p>
+        For a three-phase motor, we need three output wires (phases A, B, C).
+        Each phase must sometimes be connected to the <strong>positive</strong> side of the DC bus and sometimes to the <strong>negative</strong> side.
+        That is why each phase uses a pair of switches:
+      </p>
+
+      <div class="note">
+        <strong>One phase = two switches:</strong><br />
+        – a “top” switch connects the phase to <strong>+DC</strong><br />
+        – a “bottom” switch connects the phase to <strong>−DC</strong><br />
+        (We never turn both ON at the same time.)
+      </div>
+
+      <p>
+        Since we have three phases, we need:
+        <strong>3 phases × 2 switches per phase = 6 switches</strong>.
+      </p>
+
+      <p class="note">
+        <strong>Safety note (important):</strong>
+        In each phase leg, the top and bottom switches must not be ON at the same time.
+        Turning both ON would short the DC bus (“shoot-through”).
+        Real inverters add a small timing gap (“dead-time”) to prevent this.
+        You don’t need to implement dead-time here — just know the rule exists.
+      </p>
+
+      <p>
+        Now here is the key beginner insight:
+        because each phase is controlled by ON/OFF switches, the inverter can only produce a limited set of “instantaneous” phase voltages.
+        Those limits are exactly what the SVM hexagon will visualize.
+      </p>
+    </section>
+
+    <section id="idea" class="section">
+      <h2>1) The core idea (step by step)</h2>
+
+      <p>
+        The inverter’s switches are ON/OFF.
+        This means the inverter cannot instantly output any voltage we wish.
+        Instead, it can only output a limited set of possibilities defined by how the switches are positioned.
       </p>
 
       <div class="note">
         <strong>Think of SVM as a simple 3-step ladder:</strong>
         <ol>
-          <li><strong>Hardware:</strong> the inverter can only do ON/OFF switching.</li>
-          <li><strong>Limits:</strong> those ON/OFF combinations create only a limited set of voltage possibilities.</li>
-          <li><strong>Strategy:</strong> SVM decides how to switch over time to approximate the voltage we want (we’ll do this later).</li>
+          <li>
+            <strong>Hardware reality:</strong>
+            the inverter is made of ON/OFF switches.
+          </li>
+          <li>
+            <strong>Geometric limits:</strong>
+            ON/OFF combinations produce only a limited set of possible voltage “directions.”
+          </li>
+          <li>
+            <strong>SVM strategy:</strong>
+            we switch between a few allowed directions fast enough that, over a short time window,
+            the motor experiences the average we want. (We will show this visually in SVM 02.)
+          </li>
         </ol>
       </div>
 
       <p>
-        In other words, SVM works within the inverter’s constraints by choosing a sequence of
-        <strong>valid inverter states defined by the hardware</strong>.
+        For this first article, we will focus on step (2):
+        understanding the <strong>geometric limits</strong> produced by the inverter’s ON/OFF nature.
       </p>
     </section>
 
     <section id="ab" class="section">
-      <h2>The αβ plane (our shared picture)</h2>
+      <h2>2) The αβ plane (our shared picture)</h2>
+
+      <p>
+        Three-phase systems are often described using three signals (A, B, C).
+        That is accurate, but it is hard to “see” what is happening.
+      </p>
 
       <p>
         Instead of thinking in three separate phase waveforms (A, B, C), we use a single 2D picture that is easier to reason about.
@@ -85,35 +159,35 @@
       </p>
 
       <p class="note">
-        You can also think of it this way:
+        Another way to say it:
         the αβ plane is a 2D coordinate system that represents three-phase electrical quantities as a single vector,
         providing a clean geometric view of their behavior.
       </p>
 
       <p class="note">
-        If you have seen the Clarke transformation before, the αβ plane will look familiar.
-        If not, don’t worry — you do not need to derive or calculate anything in the αβ plane yet.
-        We are only using it as a visualization tool.
+        You do not need to derive or calculate anything in the αβ plane yet.
+        We are only using it as a picture to build intuition.
       </p>
     </section>
 
     <section id="preview" class="section">
-      <h2>Geometric picture (SVM hexagon)</h2>
+      <h2>3) From inverter switches → SVM hexagon (visual)</h2>
 
       <p>
-        Before going into timing, PWM, or equations, let’s look only at the geometry.
+        The SVM hexagon is not “magic math.”
+        It is a picture of what the inverter can produce because it is built from ON/OFF switches.
       </p>
 
       <p>
         <strong>How to read this diagram (for now):</strong><br />
-        – The hexagon shows the voltage limits imposed by the inverter’s switching hardware.<br />
-        – The arrow shows the voltage vector we want the motor to see.<br />
+        – The hexagon shows the voltage limits created by the inverter’s ON/OFF switching nature.<br />
+        – The arrow shows the voltage vector we wish the motor to see.<br />
         – For now, focus only on where the arrow lies inside the hexagon.
       </p>
 
       <p class="note">
-        This hexagon comes from the inverter’s discrete switching states; later we’ll show the exact states that form its corners.
-        The hexagonal shape comes directly from the inverter’s switching limits — we’ll explain why it is a hexagon later.
+        This hexagon comes from the inverter’s discrete switch combinations; later we’ll show the exact combinations that form its corners.
+        The hexagonal shape comes directly from those ON/OFF limits — we’ll explain why it is a hexagon later.
       </p>
 
       <p>
@@ -126,7 +200,7 @@
         <div class="widget-head">
           <h3 class="widget-title">SVM hexagon</h3>
           <p class="widget-note">
-            Preview only. Sector detection and T1/T2/T0 come later.
+            Preview only. In SVM 02 we will show the corner vectors explicitly and how mixing them over time creates the arrow.
           </p>
         </div>
 
@@ -152,6 +226,12 @@
           </div>
         </div>
       </div>
+
+      <p>
+        At this stage, you do not need to know any PWM formulas.
+        The only goal is to build a strong intuition:
+        <strong>the inverter is limited</strong>, and the hexagon is a clean picture of that limitation.
+      </p>
     </section>
 
     <section id="limits" class="section">
@@ -174,11 +254,12 @@
 
       <p>
         At this point, your goal is simply to recognize the SVM hexagon and understand that desired voltages must stay within
-        the limits imposed by the inverter.
+        the limits imposed by the inverter’s ON/OFF nature.
       </p>
 
       <p>
         In the next article, you will see the two nearest hexagon corner vectors and how mixing them over time creates the arrow.
+        We will explicitly draw the corner vectors and connect them to the switching combinations.
       </p>
 
       <div class="nav-bottom">
