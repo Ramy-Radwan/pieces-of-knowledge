@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SVM 02 — Two corner vectors + PWM times (T1/T2/T0)</title>
+  <meta name="description" content="SVM 02: see the two nearest corner vectors (V1/V2), the zero vector, and how PWM times T1/T2/T0 create the average rotating voltage vector." />
+  <link rel="stylesheet" href="/pieces-of-knowledge/css/main.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/pieces-of-knowledge/">Pieces of Knowledge</a>
+      <nav class="nav">
+        <a href="/pieces-of-knowledge/pages/fundamentals/index.html">Fundamentals</a>
+        <a href="/pieces-of-knowledge/pages/foc/index.html">FOC</a>
+        <a href="/pieces-of-knowledge/pages/svm/index.html">SVM</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page">
+    <div class="breadcrumb">
+      <a href="/pieces-of-knowledge/">Home</a> →
+      <a href="/pieces-of-knowledge/pages/svm/index.html">SVM</a> →
+      SVM 02
+    </div>
+
+    <h1>SVM 02 — Two corner vectors + PWM times (T1/T2/T0)</h1>
+
+    <p class="sub">
+      In SVM 01 we only looked at the hexagon and a desired rotating voltage vector inside it.
+      Here we finally show <strong>the “real” vectors the inverter can instantly produce</strong> (the hexagon corners),
+      and how <strong>PWM time slices</strong> (T1/T2/T0) create the <strong>average</strong> voltage you want.
+    </p>
+
+    <div class="toc">
+      <strong>On this page</strong>
+      <a href="#bigidea">1) The big idea</a>
+      <a href="#diagram">2) The diagram (interactive)</a>
+      <a href="#timing">3) One PWM cycle (how switching creates the average)</a>
+      <a href="#next">Next</a>
+    </div>
+
+    <section id="bigidea" class="section">
+      <h2>1) The big idea</h2>
+
+      <p>
+        The inverter is built from ON/OFF switches. So at any instant, it can only output a small set of fixed voltage vectors.
+        Those fixed vectors are the <strong>six corner vectors</strong> of the SVM hexagon (plus the <strong>zero vector</strong> at the center).
+      </p>
+
+      <div class="note">
+        <strong>What SVM does in one PWM cycle:</strong>
+        <ol>
+          <li>Pick the two nearest corner vectors around your desired direction.</li>
+          <li>Apply the first corner vector for time <strong>T1</strong>.</li>
+          <li>Apply the second corner vector for time <strong>T2</strong>.</li>
+          <li>Apply the zero vector for the remaining time <strong>T0</strong>.</li>
+        </ol>
+        The motor mostly “feels” the <strong>average</strong> of these vectors over that short PWM cycle.
+      </div>
+
+      <p class="note">
+        This page is still beginner-friendly: we will not dive into sector-math proofs.
+        We will simply show the picture and the PWM timing intuition clearly.
+      </p>
+    </section>
+
+    <section id="diagram" class="section">
+      <h2>2) The diagram (interactive)</h2>
+
+      <p>
+        <strong>How to read this diagram:</strong><br />
+        – The hexagon corners are the inverter’s <strong>instant</strong> voltage vectors (what it can output right now).<br />
+        – The green arrow is the <strong>desired average</strong> voltage vector (what we want the motor to “feel”).<br />
+        – The highlighted two corner vectors are the two neighbors used for this angle (T1 and T2).<br />
+        – The timing bars (T1/T2/T0) show how one PWM cycle is split.
+      </p>
+
+      <div class="widget" id="svm02Widget">
+        <div class="widget-head">
+          <h3 class="widget-title">SVM: corner vectors + T1/T2/T0</h3>
+          <p class="widget-note">
+            Move angle/magnitude. Enable “Animate PWM” to see the inverter “jump” between fixed vectors while the average stays steady.
+          </p>
+        </div>
+
+        <canvas id="svm02Canvas" width="760" height="520" aria-label="SVM 02 diagram"></canvas>
+
+        <div class="controls">
+          <div class="control">
+            <label>Desired vector angle (deg)</label>
+            <input id="angle" type="range" min="0" max="360" value="15" />
+            <div class="readout" id="angleReadout">—</div>
+          </div>
+
+          <div class="control">
+            <label>Desired magnitude (0–1)</label>
+            <input id="mag" type="range" min="0" max="100" value="70" />
+            <div class="readout">
+              Tip: Try pushing magnitude up until T0 becomes small. If magnitude is too high, T0 would go negative (not feasible),
+              so we clamp it to 0 for this demo.
+            </div>
+          </div>
+
+          <div class="control">
+            <label>Animate PWM inside one cycle</label>
+            <div class="readout" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+              <label style="display:flex; gap:8px; align-items:center;">
+                <input id="animate" type="checkbox" checked />
+                Animate PWM
+              </label>
+              <label style="display:flex; gap:8px; align-items:center;">
+                <input id="slow" type="checkbox" />
+                Slow motion
+              </label>
+              <label style="display:flex; gap:8px; align-items:center;">
+                <input id="showSeq" type="checkbox" checked />
+                Show switching sequence (V0–V1–V2–V0…)
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="note" id="summaryNote">
+          —
+        </div>
+      </div>
+    </section>
+
+    <section id="timing" class="section">
+      <h2>3) One PWM cycle (what you should “see”)</h2>
+
+      <p>
+        When “Animate PWM” is enabled, the highlighted “active vector” will jump between a few fixed vectors.
+        That is what the inverter can physically do (ON/OFF only).
+      </p>
+
+      <p class="note">
+        <strong>Key beginner takeaway:</strong>
+        The inverter output looks “jumpy” instant-by-instant, but the motor largely responds to the short-time average.
+        SVM chooses the time slices (T1/T2/T0) so that the average points to the desired rotating vector.
+      </p>
+    </section>
+
+    <section id="next" class="section">
+      <h2>Next</h2>
+
+      <p>
+        Next we will formalize <strong>sector detection</strong> (which two corners are chosen),
+        and we will connect the corner vectors to <strong>actual switch combinations</strong> (e.g., 100, 110, …).
+      </p>
+
+      <div class="nav-bottom">
+        <a href="/pieces-of-knowledge/pages/svm/svm-01.html">← Back to SVM 01</a>
+        <a href="/pieces-of-knowledge/pages/svm/index.html">Back to SVM index →</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Comments</h2>
+      <div id="comments-embed"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© <span id="year"></span> Pieces of Knowledge</p></div>
+  </footer>
+
+  <script src="/pieces-of-knowledge/js/main.js"></script>
+
+  <script type="module">
+    // ===========================
+    // SVM 02 — Interactive Demo
+    // ===========================
+    // This is a beginner-first visualization:
+    // - Draw hexagon (6 corner vectors)
+    // - Draw desired vector (average)
+    // - Determine sector + two nearest corners
+    // - Compute simplified SVM times (T1/T2/T0) for intuition
+    // - Animate "instant" inverter vectors within a PWM cycle
+
+    const canvas = document.getElementById("svm02Canvas");
+    const ctx = canvas.getContext("2d");
+
+    const angleEl = document.getElementById("angle");
+    const magEl   = document.getElementById("mag");
+    const animateEl = document.getElementById("animate");
+    const slowEl = document.getElementById("slow");
+    const showSeqEl = document.getElementById("showSeq");
+
+    const angleReadout = document.getElementById("angleReadout");
+    const summaryNote = document.getElementById("summaryNote");
+
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // Layout
+    const cx = Math.round(W * 0.36);
+    const cy = Math.round(H * 0.48);
+    const R  = Math.round(Math.min(W, H) * 0.28); // hex radius
+
+    // Timing bars area
+    const barsX = Math.round(W * 0.66);
+    const barsY = Math.round(H * 0.18);
+    const barsW = Math.round(W * 0.28);
+    const barsH = Math.round(H * 0.54);
+
+    function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+    function deg2rad(d) { return (d * Math.PI) / 180; }
+
+    function vec(x, y) { return {x, y}; }
+    function add(a, b) { return vec(a.x + b.x, a.y + b.y); }
+    function sub(a, b) { return vec(a.x - b.x, a.y - b.y); }
+    function mul(a, s) { return vec(a.x * s, a.y * s); }
+    function len(a) { return Math.hypot(a.x, a.y); }
+
+    function drawArrow(from, to, width = 2) {
+      const v = sub(to, from);
+      const L = len(v);
+      if (L < 1) return;
+
+      const head = 10;
+      const ang = Math.atan2(v.y, v.x);
+
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(to.x, to.y);
+      ctx.stroke();
+
+      // Arrow head
+      ctx.beginPath();
+      ctx.moveTo(to.x, to.y);
+      ctx.lineTo(to.x - head * Math.cos(ang - Math.PI / 7), to.y - head * Math.sin(ang - Math.PI / 7));
+      ctx.lineTo(to.x - head * Math.cos(ang + Math.PI / 7), to.y - head * Math.sin(ang + Math.PI / 7));
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawText(text, x, y, align = "left") {
+      ctx.textAlign = align;
+      ctx.fillText(text, x, y);
+    }
+
+    // Six corner vectors (unit directions) at 0,60,120,... degrees
+    function cornerUnit(k) {
+      const a = deg2rad(k * 60);
+      return vec(Math.cos(a), Math.sin(a));
+    }
+
+    // Determine sector 0..5 and local alpha 0..60
+    function sectorInfo(angleDeg) {
+      let a = angleDeg % 360;
+      if (a < 0) a += 360;
+      const sector = Math.floor(a / 60) % 6;
+      const alpha = a - sector * 60; // 0..60
+      return { sector, alpha, a };
+    }
+
+    // Simplified SVM timing (normalized)
+    // Using typical formulas for the two active vectors in a sector:
+    // T1 = m * sin(60 - alpha)/sin(60)
+    // T2 = m * sin(alpha)/sin(60)
+    // T0 = 1 - T1 - T2   (clamp to >=0 for demo)
+    function svmTimes(m, alphaDeg) {
+      const sin60 = Math.sin(Math.PI / 3);
+      const a = deg2rad(alphaDeg);
+      let T1 = m * Math.sin((Math.PI / 3) - a) / sin60;
+      let T2 = m * Math.sin(a) / sin60;
+
+      // Numeric safety
+      if (!Number.isFinite(T1)) T1 = 0;
+      if (!Number.isFinite(T2)) T2 = 0;
+
+      // For intuition: clamp negatives
+      T1 = clamp(T1, 0, 1);
+      T2 = clamp(T2, 0, 1);
+
+      let T0 = 1 - T1 - T2;
+      if (T0 < 0) T0 = 0;
+
+      // Normalize if T1+T2>1 (to keep bars meaningful)
+      const sum = T1 + T2 + T0;
+      if (sum > 0) {
+        T1 /= sum;
+        T2 /= sum;
+        T0 /= sum;
+      }
+
+      return { T1, T2, T0 };
+    }
+
+    // Build a symmetric switching sequence (common in SVM)
+    // V0 - V1 - V2 - V7 - V2 - V1 - V0
+    // We'll treat V0 and V7 as "zero vectors" (center)
+    function buildSequence(T1, T2, T0, s, sNext) {
+      const t0h = T0 * 0.5;
+      return [
+        { name: "V0", kind: "zero", dur: t0h },
+        { name: `V${s+1}`, kind: "active1", dur: T1, sector: s },
+        { name: `V${((s+1)%6)+1}`, kind: "active2", dur: T2, sector: s },
+        { name: "V7", kind: "zero", dur: T0, },
+        { name: `V${((s+1)%6)+1}`, kind: "active2", dur: T2, sector: s },
+        { name: `V${s+1}`, kind: "active1", dur: T1, sector: s },
+        { name: "V0", kind: "zero", dur: t0h },
+      ];
+    }
+
+    function drawHexagon() {
+      ctx.save();
+      ctx.strokeStyle = "rgba(0,0,0,0.25)";
+      ctx.lineWidth = 2;
+
+      ctx.beginPath();
+      for (let k = 0; k < 6; k++) {
+        const u = cornerUnit(k);
+        const p = vec(cx + u.x * R, cy - u.y * R);
+        if (k === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+
+      // draw center cross
+      ctx.strokeStyle = "rgba(0,0,0,0.15)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(cx - 8, cy);
+      ctx.lineTo(cx + 8, cy);
+      ctx.moveTo(cx, cy - 8);
+      ctx.lineTo(cx, cy + 8);
+      ctx.stroke();
+
+      // label corners V1..V6
+      ctx.fillStyle = "rgba(0,0,0,0.7)";
+      ctx.font = "13px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+      for (let k = 0; k < 6; k++) {
+        const u = cornerUnit(k);
+        const p = vec(cx + u.x * (R + 18), cy - u.y * (R + 18));
+        drawText(`V${k+1}`, p.x, p.y, "center");
+      }
+
+      ctx.restore();
+    }
+
+    function drawTimingBars(T1, T2, T0) {
+      ctx.save();
+
+      // Panel
+      ctx.fillStyle = "rgba(0,0,0,0.03)";
+      ctx.fillRect(barsX - 12, barsY - 18, barsW + 24, barsH + 72);
+      ctx.strokeStyle = "rgba(0,0,0,0.15)";
+      ctx.strokeRect(barsX - 12, barsY - 18, barsW + 24, barsH + 72);
+
+      ctx.fillStyle = "rgba(0,0,0,0.8)";
+      ctx.font = "15px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+      drawText("One PWM cycle (normalized)", barsX, barsY - 26, "left");
+
+      const totalH = barsH;
+      const barW = Math.round(barsW * 0.52);
+      const x = barsX;
+      let y = barsY;
+
+      function block(label, frac, fill) {
+        const h = Math.round(totalH * frac);
+        ctx.fillStyle = fill;
+        ctx.fillRect(x, y, barW, h);
+        ctx.strokeStyle = "rgba(0,0,0,0.18)";
+        ctx.strokeRect(x, y, barW, h);
+
+        ctx.fillStyle = "rgba(0,0,0,0.85)";
+        ctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+        drawText(`${label}: ${(frac*100).toFixed(1)}%`, x + barW + 14, y + Math.max(18, h*0.5), "left");
+        y += h;
+      }
+
+      // Draw in a meaningful order: T1, T2, T0
+      block("T1 (corner 1)", T1, "rgba(0,0,0,0.10)");
+      block("T2 (corner 2)", T2, "rgba(0,0,0,0.16)");
+      block("T0 (zero vector)", T0, "rgba(0,0,0,0.06)");
+
+      // Note
+      ctx.fillStyle = "rgba(0,0,0,0.75)";
+      ctx.font = "13px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+      drawText("Idea: apply V1 for T1, V2 for T2,", barsX, barsY + barsH + 26, "left");
+      drawText("and zero vector for the rest (T0).", barsX, barsY + barsH + 46, "left");
+
+      ctx.restore();
+    }
+
+    function drawLegend(activeName, sector, alpha) {
+      ctx.save();
+      ctx.fillStyle = "rgba(0,0,0,0.75)";
+      ctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+      const x = 24;
+      const y = 34;
+
+      drawText(`Sector: ${sector + 1} (angles ${sector*60}°..${sector*60+60}°)`, x, y, "left");
+      drawText(`Local angle inside sector: α = ${alpha.toFixed(1)}°`, x, y + 20, "left");
+      drawText(`Active (instant) vector right now: ${activeName}`, x, y + 40, "left");
+
+      ctx.restore();
+    }
+
+    function desiredVector(angleDeg, mag01) {
+      const a = deg2rad(angleDeg);
+      return vec(Math.cos(a) * mag01, Math.sin(a) * mag01);
+    }
+
+    function toScreen(u) {
+      return vec(cx + u.x * R, cy - u.y * R);
+    }
+
+    // Active corner vectors in the current sector:
+    // Sector s uses V(s+1) and V(s+2) (wrapping around)
+    function sectorCorners(s) {
+      const u1 = cornerUnit(s);
+      const u2 = cornerUnit((s + 1) % 6);
+      return { u1, u2 };
+    }
+
+    // Determine which vector is "active" at time t in [0,1) within one PWM cycle
+    function activeAt(seq, t) {
+      let acc = 0;
+      for (const step of seq) {
+        const dur = step.dur;
+        if (dur <= 0) continue;
+        if (t >= acc && t < acc + dur) return step;
+        acc += dur;
+      }
+      // fallback
+      return seq[seq.length - 1];
+    }
+
+    function draw() {
+      // Inputs
+      const angleDeg = Number(angleEl.value);
+      const mag01 = clamp(Number(magEl.value) / 100, 0, 1);
+
+      const { sector, alpha } = sectorInfo(angleDeg);
+      const { T1, T2, T0 } = svmTimes(mag01, alpha);
+
+      // Determine corner vectors
+      const { u1, u2 } = sectorCorners(sector);
+
+      // PWM animation time
+      const now = performance.now();
+      const speed = slowEl.checked ? 0.20 : 0.85; // cycles per second
+      const t = ((now / 1000) * speed) % 1; // 0..1
+
+      const seq = buildSequence(T1, T2, T0, sector, (sector + 1) % 6);
+      const step = animateEl.checked ? activeAt(seq, t) : { name: "— (not animating)", kind: "none", dur: 1 };
+
+      // Clear
+      ctx.clearRect(0, 0, W, H);
+
+      // Background
+      ctx.fillStyle = "rgba(0,0,0,0.01)";
+      ctx.fillRect(0, 0, W, H);
+
+      // Hexagon
+      drawHexagon();
+
+      // Draw all corner vectors lightly
+      ctx.save();
+      ctx.strokeStyle = "rgba(0,0,0,0.14)";
+      ctx.fillStyle = "rgba(0,0,0,0.14)";
+      for (let k = 0; k < 6; k++) {
+        const u = cornerUnit(k);
+        const p = toScreen(u);
+        drawArrow(vec(cx, cy), p, 2);
+      }
+      ctx.restore();
+
+      // Highlight the two chosen corner vectors (u1, u2)
+      ctx.save();
+      // Corner 1
+      ctx.strokeStyle = "rgba(0,0,0,0.55)";
+      ctx.fillStyle   = "rgba(0,0,0,0.55)";
+      drawArrow(vec(cx, cy), toScreen(u1), 3);
+
+      // Corner 2
+      ctx.strokeStyle = "rgba(0,0,0,0.75)";
+      ctx.fillStyle   = "rgba(0,0,0,0.75)";
+      drawArrow(vec(cx, cy), toScreen(u2), 3);
+      ctx.restore();
+
+      // Desired average vector
+      const d = desiredVector(angleDeg, mag01);
+      ctx.save();
+      ctx.strokeStyle = "rgba(0,0,0,0.90)";
+      ctx.fillStyle   = "rgba(0,0,0,0.90)";
+      drawArrow(vec(cx, cy), toScreen(d), 4);
+      ctx.restore();
+
+      // If animating, show the active (instant) vector as a bold arrow
+      // - Active vectors: u1 or u2 (depending on step.kind)
+      // - Zero vectors: center (no arrow)
+      let activeName = "—";
+      if (animateEl.checked) {
+        activeName = step.name;
+
+        if (step.kind === "active1") {
+          ctx.save();
+          ctx.strokeStyle = "rgba(0,0,0,1)";
+          ctx.fillStyle = "rgba(0,0,0,1)";
+          drawArrow(vec(cx, cy), toScreen(u1), 7);
+          ctx.restore();
+        } else if (step.kind === "active2") {
+          ctx.save();
+          ctx.strokeStyle = "rgba(0,0,0,1)";
+          ctx.fillStyle = "rgba(0,0,0,1)";
+          drawArrow(vec(cx, cy), toScreen(u2), 7);
+          ctx.restore();
+        } else {
+          // zero vector: show a small filled circle at center
+          ctx.save();
+          ctx.fillStyle = "rgba(0,0,0,0.85)";
+          ctx.beginPath();
+          ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      // Draw labels / legend
+      ctx.save();
+      ctx.fillStyle = "rgba(0,0,0,0.8)";
+      ctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+      drawText("Desired (average) vector", cx - 10, cy + (R + 48), "center");
+      ctx.restore();
+
+      drawLegend(activeName, sector, alpha);
+
+      // Timing bars panel
+      drawTimingBars(T1, T2, T0);
+
+      // Switching sequence readout (optional)
+      if (showSeqEl.checked) {
+        ctx.save();
+        ctx.fillStyle = "rgba(0,0,0,0.75)";
+        ctx.font = "13px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+        const sx = 24;
+        const sy = H - 52;
+        const seqStr = seq.map(s => s.name).join(" → ");
+        drawText(`Typical symmetric sequence: ${seqStr}`, sx, sy, "left");
+        drawText(`Durations (normalized):  T1=${T1.toFixed(3)}  T2=${T2.toFixed(3)}  T0=${T0.toFixed(3)}`, sx, sy + 18, "left");
+        ctx.restore();
+      }
+
+      // UI readouts
+      angleReadout.textContent = `Angle = ${angleDeg}°   |   Sector ${sector + 1}   |   α = ${alpha.toFixed(1)}°`;
+      summaryNote.innerHTML =
+        `<strong>What’s happening:</strong> In this sector, we use <strong>two corner vectors</strong> (the two thick arrows)
+         plus the <strong>zero vector</strong>. The inverter jumps between them using PWM times:
+         <strong>T1=${(T1*100).toFixed(1)}%</strong>, <strong>T2=${(T2*100).toFixed(1)}%</strong>, <strong>T0=${(T0*100).toFixed(1)}%</strong>.
+         The motor mostly “feels” the <strong>average</strong> shown by the desired arrow.`;
+
+      // Loop
+      requestAnimationFrame(draw);
+    }
+
+    // Start loop
+    requestAnimationFrame(draw);
+  </script>
+</body>
+</html>
