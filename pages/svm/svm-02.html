@@ -90,13 +90,13 @@
 
         <div class="controls">
           <div class="control">
-            <label>Desired vector angle (deg)</label>
+            <label for="angle">Desired vector angle (deg)</label>
             <input id="angle" type="range" min="0" max="360" value="15" />
             <div class="readout" id="angleReadout">—</div>
           </div>
 
           <div class="control">
-            <label>Desired magnitude (0–1)</label>
+            <label for="mag">Desired magnitude (0–1)</label>
             <input id="mag" type="range" min="0" max="100" value="70" />
             <div class="readout">
               Tip: Try pushing magnitude up until T0 becomes small. If magnitude is too high, T0 would go negative (not feasible),
@@ -105,17 +105,20 @@
           </div>
 
           <div class="control">
-            <label>Animate PWM inside one cycle</label>
             <div class="readout" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-              <label style="display:flex; gap:8px; align-items:center;">
+              <span style="opacity:0.9; font-weight:600;">Animate PWM inside one cycle</span>
+
+              <label for="animate" style="display:flex; gap:8px; align-items:center;">
                 <input id="animate" type="checkbox" checked />
                 Animate PWM
               </label>
-              <label style="display:flex; gap:8px; align-items:center;">
+
+              <label for="slow" style="display:flex; gap:8px; align-items:center;">
                 <input id="slow" type="checkbox" />
                 Slow motion
               </label>
-              <label style="display:flex; gap:8px; align-items:center;">
+
+              <label for="showSeq" style="display:flex; gap:8px; align-items:center;">
                 <input id="showSeq" type="checkbox" checked />
                 Show switching sequence (V0–V1–V2–V0…)
               </label>
@@ -174,12 +177,9 @@
     // ===========================
     // SVM 02 — Interactive Demo
     // ===========================
-    // This is a beginner-first visualization:
-    // - Draw hexagon (6 corner vectors)
-    // - Draw desired vector (average)
-    // - Determine sector + two nearest corners
-    // - Compute simplified SVM times (T1/T2/T0) for intuition
-    // - Animate "instant" inverter vectors within a PWM cycle
+    // Fixes included in this version:
+    // 1) Canvas contrast for dark theme (use light "ink" colors)
+    // 2) Accessibility: labels correctly associated with inputs (for="...")
 
     const canvas = document.getElementById("svm02Canvas");
     const ctx = canvas.getContext("2d");
@@ -206,6 +206,29 @@
     const barsY = Math.round(H * 0.18);
     const barsW = Math.round(W * 0.28);
     const barsH = Math.round(H * 0.54);
+
+    // Theme-aware "ink" colors for a dark UI
+    const COLORS = {
+      bg: "rgba(0,0,0,0)",                 // let CSS show through
+      panelFill: "rgba(255,255,255,0.04)",
+      panelStroke: "rgba(255,255,255,0.12)",
+
+      inkSoft: "rgba(255,255,255,0.18)",
+      inkMed: "rgba(255,255,255,0.35)",
+      inkStrong: "rgba(255,255,255,0.75)",
+      inkMax: "rgba(255,255,255,0.95)",
+
+      // Highlights
+      corner1: "rgba(255,255,255,0.55)",
+      corner2: "rgba(255,255,255,0.80)",
+      desired: "rgba(120,255,170,0.95)",   // "green" desired vector (readable on dark)
+      active: "rgba(255,255,255,1.00)",
+      zeroDot: "rgba(255,255,255,0.90)",
+
+      text: "rgba(255,255,255,0.88)",
+      textDim: "rgba(255,255,255,0.70)",
+      borderSoft: "rgba(255,255,255,0.18)"
+    };
 
     function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
     function deg2rad(d) { return (d * Math.PI) / 180; }
@@ -260,7 +283,6 @@
     }
 
     // Simplified SVM timing (normalized)
-    // Using typical formulas for the two active vectors in a sector:
     // T1 = m * sin(60 - alpha)/sin(60)
     // T2 = m * sin(alpha)/sin(60)
     // T0 = 1 - T1 - T2   (clamp to >=0 for demo)
@@ -270,18 +292,15 @@
       let T1 = m * Math.sin((Math.PI / 3) - a) / sin60;
       let T2 = m * Math.sin(a) / sin60;
 
-      // Numeric safety
       if (!Number.isFinite(T1)) T1 = 0;
       if (!Number.isFinite(T2)) T2 = 0;
 
-      // For intuition: clamp negatives
       T1 = clamp(T1, 0, 1);
       T2 = clamp(T2, 0, 1);
 
       let T0 = 1 - T1 - T2;
       if (T0 < 0) T0 = 0;
 
-      // Normalize if T1+T2>1 (to keep bars meaningful)
       const sum = T1 + T2 + T0;
       if (sum > 0) {
         T1 /= sum;
@@ -292,25 +311,26 @@
       return { T1, T2, T0 };
     }
 
-    // Build a symmetric switching sequence (common in SVM)
+    // Symmetric switching sequence (common in SVM):
     // V0 - V1 - V2 - V7 - V2 - V1 - V0
-    // We'll treat V0 and V7 as "zero vectors" (center)
-    function buildSequence(T1, T2, T0, s, sNext) {
+    function buildSequence(T1, T2, T0, s) {
       const t0h = T0 * 0.5;
+      const v1 = `V${s + 1}`;
+      const v2 = `V${((s + 1) % 6) + 1}`;
       return [
         { name: "V0", kind: "zero", dur: t0h },
-        { name: `V${s+1}`, kind: "active1", dur: T1, sector: s },
-        { name: `V${((s+1)%6)+1}`, kind: "active2", dur: T2, sector: s },
-        { name: "V7", kind: "zero", dur: T0, },
-        { name: `V${((s+1)%6)+1}`, kind: "active2", dur: T2, sector: s },
-        { name: `V${s+1}`, kind: "active1", dur: T1, sector: s },
+        { name: v1, kind: "active1", dur: T1 },
+        { name: v2, kind: "active2", dur: T2 },
+        { name: "V7", kind: "zero", dur: T0 },
+        { name: v2, kind: "active2", dur: T2 },
+        { name: v1, kind: "active1", dur: T1 },
         { name: "V0", kind: "zero", dur: t0h },
       ];
     }
 
     function drawHexagon() {
       ctx.save();
-      ctx.strokeStyle = "rgba(0,0,0,0.25)";
+      ctx.strokeStyle = COLORS.inkMed;
       ctx.lineWidth = 2;
 
       ctx.beginPath();
@@ -323,8 +343,8 @@
       ctx.closePath();
       ctx.stroke();
 
-      // draw center cross
-      ctx.strokeStyle = "rgba(0,0,0,0.15)";
+      // center cross
+      ctx.strokeStyle = COLORS.inkSoft;
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(cx - 8, cy);
@@ -334,12 +354,12 @@
       ctx.stroke();
 
       // label corners V1..V6
-      ctx.fillStyle = "rgba(0,0,0,0.7)";
+      ctx.fillStyle = COLORS.textDim;
       ctx.font = "13px system-ui, -apple-system, Segoe UI, Roboto, Arial";
       for (let k = 0; k < 6; k++) {
         const u = cornerUnit(k);
         const p = vec(cx + u.x * (R + 18), cy - u.y * (R + 18));
-        drawText(`V${k+1}`, p.x, p.y, "center");
+        drawText(`V${k + 1}`, p.x, p.y, "center");
       }
 
       ctx.restore();
@@ -349,12 +369,12 @@
       ctx.save();
 
       // Panel
-      ctx.fillStyle = "rgba(0,0,0,0.03)";
+      ctx.fillStyle = COLORS.panelFill;
       ctx.fillRect(barsX - 12, barsY - 18, barsW + 24, barsH + 72);
-      ctx.strokeStyle = "rgba(0,0,0,0.15)";
+      ctx.strokeStyle = COLORS.panelStroke;
       ctx.strokeRect(barsX - 12, barsY - 18, barsW + 24, barsH + 72);
 
-      ctx.fillStyle = "rgba(0,0,0,0.8)";
+      ctx.fillStyle = COLORS.text;
       ctx.font = "15px system-ui, -apple-system, Segoe UI, Roboto, Arial";
       drawText("One PWM cycle (normalized)", barsX, barsY - 26, "left");
 
@@ -367,22 +387,22 @@
         const h = Math.round(totalH * frac);
         ctx.fillStyle = fill;
         ctx.fillRect(x, y, barW, h);
-        ctx.strokeStyle = "rgba(0,0,0,0.18)";
+        ctx.strokeStyle = COLORS.borderSoft;
         ctx.strokeRect(x, y, barW, h);
 
-        ctx.fillStyle = "rgba(0,0,0,0.85)";
+        ctx.fillStyle = COLORS.text;
         ctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto, Arial";
-        drawText(`${label}: ${(frac*100).toFixed(1)}%`, x + barW + 14, y + Math.max(18, h*0.5), "left");
+        drawText(`${label}: ${(frac * 100).toFixed(1)}%`, x + barW + 14, y + Math.max(18, h * 0.5), "left");
         y += h;
       }
 
-      // Draw in a meaningful order: T1, T2, T0
-      block("T1 (corner 1)", T1, "rgba(0,0,0,0.10)");
-      block("T2 (corner 2)", T2, "rgba(0,0,0,0.16)");
-      block("T0 (zero vector)", T0, "rgba(0,0,0,0.06)");
+      // Use subtle fills that still show on dark
+      block("T1 (corner 1)", T1, "rgba(255,255,255,0.10)");
+      block("T2 (corner 2)", T2, "rgba(255,255,255,0.16)");
+      block("T0 (zero vector)", T0, "rgba(255,255,255,0.06)");
 
       // Note
-      ctx.fillStyle = "rgba(0,0,0,0.75)";
+      ctx.fillStyle = COLORS.textDim;
       ctx.font = "13px system-ui, -apple-system, Segoe UI, Roboto, Arial";
       drawText("Idea: apply V1 for T1, V2 for T2,", barsX, barsY + barsH + 26, "left");
       drawText("and zero vector for the rest (T0).", barsX, barsY + barsH + 46, "left");
@@ -392,12 +412,12 @@
 
     function drawLegend(activeName, sector, alpha) {
       ctx.save();
-      ctx.fillStyle = "rgba(0,0,0,0.75)";
+      ctx.fillStyle = COLORS.textDim;
       ctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto, Arial";
       const x = 24;
       const y = 34;
 
-      drawText(`Sector: ${sector + 1} (angles ${sector*60}°..${sector*60+60}°)`, x, y, "left");
+      drawText(`Sector: ${sector + 1} (angles ${sector * 60}°..${sector * 60 + 60}°)`, x, y, "left");
       drawText(`Local angle inside sector: α = ${alpha.toFixed(1)}°`, x, y + 20, "left");
       drawText(`Active (instant) vector right now: ${activeName}`, x, y + 40, "left");
 
@@ -413,15 +433,13 @@
       return vec(cx + u.x * R, cy - u.y * R);
     }
 
-    // Active corner vectors in the current sector:
-    // Sector s uses V(s+1) and V(s+2) (wrapping around)
+    // Sector s uses V(s+1) and V(s+2) (wrapping)
     function sectorCorners(s) {
       const u1 = cornerUnit(s);
       const u2 = cornerUnit((s + 1) % 6);
       return { u1, u2 };
     }
 
-    // Determine which vector is "active" at time t in [0,1) within one PWM cycle
     function activeAt(seq, t) {
       let acc = 0;
       for (const step of seq) {
@@ -430,34 +448,30 @@
         if (t >= acc && t < acc + dur) return step;
         acc += dur;
       }
-      // fallback
       return seq[seq.length - 1];
     }
 
     function draw() {
-      // Inputs
       const angleDeg = Number(angleEl.value);
       const mag01 = clamp(Number(magEl.value) / 100, 0, 1);
 
       const { sector, alpha } = sectorInfo(angleDeg);
       const { T1, T2, T0 } = svmTimes(mag01, alpha);
 
-      // Determine corner vectors
       const { u1, u2 } = sectorCorners(sector);
 
-      // PWM animation time
       const now = performance.now();
-      const speed = slowEl.checked ? 0.20 : 0.85; // cycles per second
-      const t = ((now / 1000) * speed) % 1; // 0..1
+      const speed = slowEl.checked ? 0.20 : 0.85;
+      const t = ((now / 1000) * speed) % 1;
 
-      const seq = buildSequence(T1, T2, T0, sector, (sector + 1) % 6);
+      const seq = buildSequence(T1, T2, T0, sector);
       const step = animateEl.checked ? activeAt(seq, t) : { name: "— (not animating)", kind: "none", dur: 1 };
 
       // Clear
       ctx.clearRect(0, 0, W, H);
 
-      // Background
-      ctx.fillStyle = "rgba(0,0,0,0.01)";
+      // Slight panel background to separate canvas from page
+      ctx.fillStyle = "rgba(255,255,255,0.02)";
       ctx.fillRect(0, 0, W, H);
 
       // Hexagon
@@ -465,59 +479,53 @@
 
       // Draw all corner vectors lightly
       ctx.save();
-      ctx.strokeStyle = "rgba(0,0,0,0.14)";
-      ctx.fillStyle = "rgba(0,0,0,0.14)";
+      ctx.strokeStyle = COLORS.inkSoft;
+      ctx.fillStyle = COLORS.inkSoft;
       for (let k = 0; k < 6; k++) {
         const u = cornerUnit(k);
-        const p = toScreen(u);
-        drawArrow(vec(cx, cy), p, 2);
+        drawArrow(vec(cx, cy), toScreen(u), 2);
       }
       ctx.restore();
 
-      // Highlight the two chosen corner vectors (u1, u2)
+      // Highlight chosen corner vectors
       ctx.save();
-      // Corner 1
-      ctx.strokeStyle = "rgba(0,0,0,0.55)";
-      ctx.fillStyle   = "rgba(0,0,0,0.55)";
+      ctx.strokeStyle = COLORS.corner1;
+      ctx.fillStyle = COLORS.corner1;
       drawArrow(vec(cx, cy), toScreen(u1), 3);
 
-      // Corner 2
-      ctx.strokeStyle = "rgba(0,0,0,0.75)";
-      ctx.fillStyle   = "rgba(0,0,0,0.75)";
+      ctx.strokeStyle = COLORS.corner2;
+      ctx.fillStyle = COLORS.corner2;
       drawArrow(vec(cx, cy), toScreen(u2), 3);
       ctx.restore();
 
-      // Desired average vector
+      // Desired average vector (green)
       const d = desiredVector(angleDeg, mag01);
       ctx.save();
-      ctx.strokeStyle = "rgba(0,0,0,0.90)";
-      ctx.fillStyle   = "rgba(0,0,0,0.90)";
+      ctx.strokeStyle = COLORS.desired;
+      ctx.fillStyle = COLORS.desired;
       drawArrow(vec(cx, cy), toScreen(d), 4);
       ctx.restore();
 
-      // If animating, show the active (instant) vector as a bold arrow
-      // - Active vectors: u1 or u2 (depending on step.kind)
-      // - Zero vectors: center (no arrow)
+      // Active instant vector overlay when animating
       let activeName = "—";
       if (animateEl.checked) {
         activeName = step.name;
 
         if (step.kind === "active1") {
           ctx.save();
-          ctx.strokeStyle = "rgba(0,0,0,1)";
-          ctx.fillStyle = "rgba(0,0,0,1)";
+          ctx.strokeStyle = COLORS.active;
+          ctx.fillStyle = COLORS.active;
           drawArrow(vec(cx, cy), toScreen(u1), 7);
           ctx.restore();
         } else if (step.kind === "active2") {
           ctx.save();
-          ctx.strokeStyle = "rgba(0,0,0,1)";
-          ctx.fillStyle = "rgba(0,0,0,1)";
+          ctx.strokeStyle = COLORS.active;
+          ctx.fillStyle = COLORS.active;
           drawArrow(vec(cx, cy), toScreen(u2), 7);
           ctx.restore();
         } else {
-          // zero vector: show a small filled circle at center
           ctx.save();
-          ctx.fillStyle = "rgba(0,0,0,0.85)";
+          ctx.fillStyle = COLORS.zeroDot;
           ctx.beginPath();
           ctx.arc(cx, cy, 6, 0, Math.PI * 2);
           ctx.fill();
@@ -525,22 +533,19 @@
         }
       }
 
-      // Draw labels / legend
+      // Labels / legend
       ctx.save();
-      ctx.fillStyle = "rgba(0,0,0,0.8)";
+      ctx.fillStyle = COLORS.textDim;
       ctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto, Arial";
       drawText("Desired (average) vector", cx - 10, cy + (R + 48), "center");
       ctx.restore();
 
       drawLegend(activeName, sector, alpha);
-
-      // Timing bars panel
       drawTimingBars(T1, T2, T0);
 
-      // Switching sequence readout (optional)
       if (showSeqEl.checked) {
         ctx.save();
-        ctx.fillStyle = "rgba(0,0,0,0.75)";
+        ctx.fillStyle = COLORS.textDim;
         ctx.font = "13px system-ui, -apple-system, Segoe UI, Roboto, Arial";
         const sx = 24;
         const sy = H - 52;
@@ -552,17 +557,16 @@
 
       // UI readouts
       angleReadout.textContent = `Angle = ${angleDeg}°   |   Sector ${sector + 1}   |   α = ${alpha.toFixed(1)}°`;
+
       summaryNote.innerHTML =
         `<strong>What’s happening:</strong> In this sector, we use <strong>two corner vectors</strong> (the two thick arrows)
          plus the <strong>zero vector</strong>. The inverter jumps between them using PWM times:
          <strong>T1=${(T1*100).toFixed(1)}%</strong>, <strong>T2=${(T2*100).toFixed(1)}%</strong>, <strong>T0=${(T0*100).toFixed(1)}%</strong>.
-         The motor mostly “feels” the <strong>average</strong> shown by the desired arrow.`;
+         The motor mostly “feels” the <strong>average</strong> shown by the green desired arrow.`;
 
-      // Loop
       requestAnimationFrame(draw);
     }
 
-    // Start loop
     requestAnimationFrame(draw);
   </script>
 </body>
