@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>F07 — The αβ plane (one rotating vector)</title>
+  <meta name="description" content="The αβ plane: a 2D coordinate system that represents three-phase quantities as a single vector." />
+  <link rel="stylesheet" href="/pieces-of-knowledge/css/main.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/pieces-of-knowledge/">Pieces of Knowledge</a>
+      <nav class="nav">
+        <a href="/pieces-of-knowledge/pages/fundamentals/index.html">Fundamentals</a>
+        <a href="/pieces-of-knowledge/pages/foc/index.html">FOC</a>
+        <a href="/pieces-of-knowledge/pages/svm/index.html">SVM</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page">
+    <div class="breadcrumb">
+      <a href="/pieces-of-knowledge/">Home</a> →
+      <a href="/pieces-of-knowledge/pages/fundamentals/index.html">Fundamentals</a> →
+      F07
+    </div>
+
+    <h1>F07 — The αβ plane (one rotating vector)</h1>
+
+    <p class="sub">
+      Three-phase systems are often described with three signals (A, B, C).
+      That is correct, but hard to “see”.
+      The αβ plane gives us a simple picture.
+    </p>
+
+    <div class="toc">
+      <strong>On this page</strong>
+      <a href="#sentence">1) One perfect sentence</a>
+      <a href="#why">2) Why we use αβ</a>
+      <a href="#use">3) How αβ relates to SVM and FOC</a>
+      <a href="#next">Next</a>
+    </div>
+
+    <section id="sentence" class="section">
+      <h2>1) One perfect sentence</h2>
+
+      <div class="note">
+        <strong>The αβ plane</strong> is a 2D coordinate system that represents three-phase electrical quantities as a single vector,
+        giving a clean geometric view that is easier to visualize and reason about.
+      </div>
+
+      <p class="note">
+        You do not need to derive anything yet.
+        We use αβ as a picture first, and the math later (only if needed).
+      </p>
+    </section>
+
+    <section id="why" class="section">
+      <h2>2) Why we use αβ</h2>
+
+      <p>
+        If you stare at three waveforms (A, B, C), it is hard to “see” the overall direction and strength.
+        In αβ, you can often describe the same situation as:
+      </p>
+
+      <ul>
+        <li><strong>Angle</strong> = where the vector points (electrical direction).</li>
+        <li><strong>Magnitude</strong> = how strong the vector is (how strong the electrical push is).</li>
+      </ul>
+
+      <p>
+        This is exactly why SVM diagrams are drawn in αβ: it makes the switching limits and the desired vector visible.
+      </p>
+    </section>
+
+    <section id="use" class="section">
+      <h2>3) How αβ relates to SVM and FOC</h2>
+
+      <p>
+        αβ is not “owned” by SVM or FOC.
+        It is a shared picture used across motor control:
+      </p>
+
+      <ul>
+        <li><strong>SVM</strong> uses αβ to show what voltages the inverter can synthesize (the hexagon) and how to approximate a desired vector.</li>
+        <li><strong>FOC</strong> uses αβ (and dq) to control torque-producing currents in a clean rotating reference frame.</li>
+      </ul>
+
+      <div class="note">
+        If you are going into SVM next: αβ helps you see the hexagon and corner vectors.<br />
+        If you are going into FOC next: αβ helps you describe rotating quantities before moving into dq.
+      </div>
+    </section>
+
+    <section id="next" class="section">
+      <h2>Next</h2>
+      <div class="nav-bottom">
+        <a href="/pieces-of-knowledge/pages/fundamentals/f06-pwm-3phase.html">← Back to F06</a>
+        <a href="/pieces-of-knowledge/pages/svm/svm-01.html">Go to SVM 01 →</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Comments</h2>
+      <div id="comments-embed"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© <span id="year"></span> Pieces of Knowledge</p></div>
+  </footer>
+
+  <script src="/pieces-of-knowledge/js/main.js"></script>
+</body>
+</html>

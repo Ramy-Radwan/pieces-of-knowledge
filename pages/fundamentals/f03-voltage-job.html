@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>F03 — Voltage’s job: how current changes</title>
+  <meta name="description" content="Voltage is what pushes current to change, and speed creates back-EMF that fights you." />
+  <link rel="stylesheet" href="/pieces-of-knowledge/css/main.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/pieces-of-knowledge/">Pieces of Knowledge</a>
+      <nav class="nav">
+        <a href="/pieces-of-knowledge/pages/fundamentals/index.html">Fundamentals</a>
+        <a href="/pieces-of-knowledge/pages/foc/index.html">FOC</a>
+        <a href="/pieces-of-knowledge/pages/svm/index.html">SVM</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page">
+    <div class="breadcrumb">
+      <a href="/pieces-of-knowledge/">Home</a> →
+      <a href="/pieces-of-knowledge/pages/fundamentals/index.html">Fundamentals</a> →
+      F03
+    </div>
+
+    <h1>F03 — Voltage’s job: how current changes</h1>
+
+    <p class="sub">
+      If torque is mostly about current, then the next question is:
+      how do we influence current? The practical answer is: <strong>we apply voltage</strong>.
+    </p>
+
+    <div class="toc">
+      <strong>On this page</strong>
+      <a href="#push">1) Voltage “pushes” current</a>
+      <a href="#three">2) Three reasons you need voltage</a>
+      <a href="#speed">3) Why higher speed needs more voltage</a>
+      <a href="#next">Next</a>
+    </div>
+
+    <section id="push" class="section">
+      <h2>1) Voltage “pushes” current</h2>
+
+      <p>
+        A motor phase winding is not just a wire.
+        Electrically, it behaves like:
+      </p>
+
+      <ul>
+        <li><strong>Resistance (R)</strong>: causes a voltage drop when current flows.</li>
+        <li><strong>Inductance (L)</strong>: resists fast changes of current.</li>
+        <li><strong>Back-EMF</strong>: a “generated voltage” that increases with speed and fights your applied voltage.</li>
+      </ul>
+
+      <div class="note">
+        <strong>Beginner takeaway:</strong><br />
+        Voltage is what gives you the ability to change current (and keep it at the level you want).
+      </div>
+    </section>
+
+    <section id="three" class="section">
+      <h2>2) Three reasons you need voltage</h2>
+
+      <p>
+        When you apply voltage, it is “spent” in three places:
+      </p>
+
+      <ul>
+        <li><strong>R drop</strong>: part of voltage is used just to overcome resistance (heating loss).</li>
+        <li><strong>L drop</strong>: part of voltage is needed to change current quickly (dynamic behavior).</li>
+        <li><strong>Back-EMF</strong>: at speed, the motor generates a voltage that opposes you.</li>
+      </ul>
+
+      <p class="note">
+        We will later show the classic equation style (V = R·I + L·dI/dt + back-EMF),
+        but you do not need it yet. The idea is enough.
+      </p>
+    </section>
+
+    <section id="speed" class="section">
+      <h2>3) Why higher speed needs more voltage</h2>
+
+      <p>
+        At low speed, the motor generates only a small back-EMF.
+        So it is relatively easy to push current.
+      </p>
+
+      <p>
+        At high speed, back-EMF becomes large.
+        It is like the motor is “pushing back” electrically.
+        To maintain the same current (and torque), you often need more applied voltage.
+      </p>
+
+      <div class="note">
+        This is one big reason why the <strong>voltage magnitude</strong> in SVM/FOC cannot always be “maximum” or “constant”.
+        It must adapt to speed and load.
+      </div>
+
+      <p>
+        Next: how do we physically generate the voltages we want?
+        That takes us to the inverter hardware.
+      </p>
+    </section>
+
+    <section id="next" class="section">
+      <h2>Next</h2>
+      <div class="nav-bottom">
+        <a href="/pieces-of-knowledge/pages/fundamentals/f02-current-torque.html">← Back to F02</a>
+        <a href="/pieces-of-knowledge/pages/fundamentals/f04-inverter-basics.html">Go to F04 →</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Comments</h2>
+      <div id="comments-embed"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© <span id="year"></span> Pieces of Knowledge</p></div>
+  </footer>
+
+  <script src="/pieces-of-knowledge/js/main.js"></script>
+</body>
+</html>

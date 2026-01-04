@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>F05 — PWM as averaging (1 phase)</title>
+  <meta name="description" content="PWM explained simply: ON/OFF switching creates an average voltage (duty cycle) that the motor effectively feels." />
+  <link rel="stylesheet" href="/pieces-of-knowledge/css/main.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/pieces-of-knowledge/">Pieces of Knowledge</a>
+      <nav class="nav">
+        <a href="/pieces-of-knowledge/pages/fundamentals/index.html">Fundamentals</a>
+        <a href="/pieces-of-knowledge/pages/foc/index.html">FOC</a>
+        <a href="/pieces-of-knowledge/pages/svm/index.html">SVM</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page">
+    <div class="breadcrumb">
+      <a href="/pieces-of-knowledge/">Home</a> →
+      <a href="/pieces-of-knowledge/pages/fundamentals/index.html">Fundamentals</a> →
+      F05
+    </div>
+
+    <h1>F05 — PWM as averaging (1 phase)</h1>
+
+    <p class="sub">
+      The inverter cannot “dial” a voltage smoothly. It can only switch ON/OFF.
+      PWM is the trick that turns ON/OFF into a controllable <strong>average voltage</strong>.
+    </p>
+
+    <div class="toc">
+      <strong>On this page</strong>
+      <a href="#problem">1) The problem: only two levels</a>
+      <a href="#idea">2) The idea: fast switching + averaging</a>
+      <a href="#duty">3) Duty cycle (the simple knob)</a>
+      <a href="#whyworks">4) Why the motor “feels” the average</a>
+      <a href="#next">Next</a>
+    </div>
+
+    <section id="problem" class="section">
+      <h2>1) The problem: only two levels</h2>
+
+      <p>
+        Imagine you have only two possible voltages you can apply:
+      </p>
+
+      <div class="note">
+        OFF → 0 V<br />
+        ON  → Vdc (the DC bus voltage)
+      </div>
+
+      <p>
+        But you might want something in the middle, like “half strength”.
+        The inverter cannot output half instantly. It can only output ON or OFF.
+      </p>
+    </section>
+
+    <section id="idea" class="section">
+      <h2>2) The idea: fast switching + averaging</h2>
+
+      <p>
+        PWM (Pulse Width Modulation) does this:
+      </p>
+
+      <ul>
+        <li>Switch ON for a short time</li>
+        <li>Switch OFF for a short time</li>
+        <li>Repeat very fast</li>
+      </ul>
+
+      <p class="note">
+        If ON happens 50% of the time, the <strong>average</strong> behaves like “half voltage”.
+        If ON happens 20% of the time, the average behaves like “small voltage”.
+      </p>
+    </section>
+
+    <section id="duty" class="section">
+      <h2>3) Duty cycle (the simple knob)</h2>
+
+      <p>
+        The “percentage of ON time” in each PWM cycle is called <strong>duty cycle</strong>.
+      </p>
+
+      <div class="note">
+        <strong>Duty = 0%</strong> → average voltage ~ 0<br />
+        <strong>Duty = 50%</strong> → average voltage ~ 0.5 × Vdc<br />
+        <strong>Duty = 100%</strong> → average voltage ~ Vdc
+      </div>
+
+      <p>
+        This is exactly why your SVM demo has a magnitude slider:
+        it represents “how much voltage” we want on average.
+      </p>
+    </section>
+
+    <section id="whyworks" class="section">
+      <h2>4) Why the motor “feels” the average</h2>
+
+      <p>
+        Two reasons:
+      </p>
+
+      <ul>
+        <li><strong>Inductance</strong> in the motor windings smooths current changes (current cannot jump instantly).</li>
+        <li><strong>Mechanical inertia</strong> smooths torque and speed (the rotor cannot jump instantly either).</li>
+      </ul>
+
+      <p class="note">
+        So even though the inverter output is “jumpy” instant-by-instant, the motor responds mostly to the short-time average.
+      </p>
+
+      <p>
+        Next: how does this work with <strong>three phases</strong> — and why it creates a rotating effect?
+      </p>
+    </section>
+
+    <section id="next" class="section">
+      <h2>Next</h2>
+      <div class="nav-bottom">
+        <a href="/pieces-of-knowledge/pages/fundamentals/f04-inverter-basics.html">← Back to F04</a>
+        <a href="/pieces-of-knowledge/pages/fundamentals/f06-pwm-3phase.html">Go to F06 →</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Comments</h2>
+      <div id="comments-embed"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© <span id="year"></span> Pieces of Knowledge</p></div>
+  </footer>
+
+  <script src="/pieces-of-knowledge/js/main.js"></script>
+</body>
+</html>

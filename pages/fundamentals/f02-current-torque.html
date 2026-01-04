@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>F02 — Why current creates torque (push strength)</title>
+  <meta name="description" content="Beginner intuition: torque comes from magnetic interaction, and current creates magnetic push." />
+  <link rel="stylesheet" href="/pieces-of-knowledge/css/main.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/pieces-of-knowledge/">Pieces of Knowledge</a>
+      <nav class="nav">
+        <a href="/pieces-of-knowledge/pages/fundamentals/index.html">Fundamentals</a>
+        <a href="/pieces-of-knowledge/pages/foc/index.html">FOC</a>
+        <a href="/pieces-of-knowledge/pages/svm/index.html">SVM</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page">
+    <div class="breadcrumb">
+      <a href="/pieces-of-knowledge/">Home</a> →
+      <a href="/pieces-of-knowledge/pages/fundamentals/index.html">Fundamentals</a> →
+      F02
+    </div>
+
+    <h1>F02 — Why current creates torque (push strength)</h1>
+
+    <p class="sub">
+      Torque in electric motors comes from magnetic “push”.
+      Current is what creates and strengthens that push.
+    </p>
+
+    <div class="toc">
+      <strong>On this page</strong>
+      <a href="#idea">1) The core idea (no math)</a>
+      <a href="#why">2) Why controlling current matters</a>
+      <a href="#lead">3) What voltage has to do with it</a>
+      <a href="#next">Next</a>
+    </div>
+
+    <section id="idea" class="section">
+      <h2>1) The core idea (no math)</h2>
+
+      <p>
+        Most motors have:
+      </p>
+      <ul>
+        <li>A magnetic field on the rotor (permanent magnets, or an energized rotor winding).</li>
+        <li>A magnetic field created by currents in the stator windings.</li>
+      </ul>
+
+      <p>
+        When these magnetic fields interact, the rotor experiences a turning force:
+        <strong>torque</strong>.
+      </p>
+
+      <div class="note">
+        <strong>Beginner rule of thumb:</strong><br />
+        More current → stronger magnetic effect → more torque (up to limits).
+      </div>
+
+      <p>
+        So when you ask the motor for “more push”, what you are really asking for is:
+        <strong>more current in the right direction</strong>.
+      </p>
+    </section>
+
+    <section id="why" class="section">
+      <h2>2) Why controlling current matters</h2>
+
+      <p>
+        Current is powerful — and dangerous if uncontrolled:
+      </p>
+
+      <ul>
+        <li>Too much current → heating → damage.</li>
+        <li>Current spikes → noise and vibration.</li>
+        <li>Unstable current → unstable torque → ugly speed behavior.</li>
+      </ul>
+
+      <p class="note">
+        This is why advanced control methods (especially FOC) often focus on controlling current tightly.
+        But even simple BLDC control still uses PWM duty to influence current.
+      </p>
+    </section>
+
+    <section id="lead" class="section">
+      <h2>3) What voltage has to do with it</h2>
+
+      <p>
+        Here is the next key:
+      </p>
+
+      <div class="note">
+        We do not “set current directly” like a knob.<br />
+        We usually control <strong>voltage</strong>, and the motor’s electrical physics decides how current changes.
+      </div>
+
+      <p>
+        Next page: what voltage actually does inside a motor winding — and why speed changes the needed voltage.
+      </p>
+    </section>
+
+    <section id="next" class="section">
+      <h2>Next</h2>
+      <div class="nav-bottom">
+        <a href="/pieces-of-knowledge/pages/fundamentals/f01-speed-torque.html">← Back to F01</a>
+        <a href="/pieces-of-knowledge/pages/fundamentals/f03-voltage-job.html">Go to F03 →</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Comments</h2>
+      <div id="comments-embed"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© <span id="year"></span> Pieces of Knowledge</p></div>
+  </footer>
+
+  <script src="/pieces-of-knowledge/js/main.js"></script>
+</body>
+</html>

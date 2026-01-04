@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>F01 — Speed vs Torque (the real goal)</title>
+  <meta name="description" content="Motor control starts with two targets: torque (push) and speed (how fast). Beginner-friendly explanation." />
+  <link rel="stylesheet" href="/pieces-of-knowledge/css/main.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/pieces-of-knowledge/">Pieces of Knowledge</a>
+      <nav class="nav">
+        <a href="/pieces-of-knowledge/pages/fundamentals/index.html">Fundamentals</a>
+        <a href="/pieces-of-knowledge/pages/foc/index.html">FOC</a>
+        <a href="/pieces-of-knowledge/pages/svm/index.html">SVM</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page">
+    <div class="breadcrumb">
+      <a href="/pieces-of-knowledge/">Home</a> →
+      <a href="/pieces-of-knowledge/pages/fundamentals/index.html">Fundamentals</a> →
+      F01
+    </div>
+
+    <h1>F01 — Speed vs Torque (the real goal)</h1>
+
+    <p class="sub">
+      Before SVM and FOC, we must be clear about the goal.
+      Motor control is mainly about controlling <strong>torque</strong> and <strong>speed</strong>.
+    </p>
+
+    <div class="toc">
+      <strong>On this page</strong>
+      <a href="#two">1) Two knobs: torque and speed</a>
+      <a href="#examples">2) Real-life examples</a>
+      <a href="#link">3) How this connects to SVM/FOC</a>
+      <a href="#next">Next</a>
+    </div>
+
+    <section id="two" class="section">
+      <h2>1) Two knobs: torque and speed</h2>
+
+      <p>
+        Think of a motor like a person pushing a door:
+      </p>
+
+      <ul>
+        <li><strong>Torque</strong> = how hard you push (push strength).</li>
+        <li><strong>Speed</strong> = how fast it rotates (how quickly it turns).</li>
+      </ul>
+
+      <p>
+        Most of the time, we do not want “maximum everything”.
+        We want the motor to do a specific job:
+        accelerate, maintain speed, hold position, move smoothly, not overheat, not exceed current limits, etc.
+      </p>
+
+      <div class="note">
+        <strong>Simple mental model:</strong><br />
+        – Torque makes the motor <strong>accelerate</strong> (or resist a load).<br />
+        – Speed is the result after acceleration continues for some time.<br />
+        – If you keep pushing hard (high torque), speed keeps rising until something limits it.
+      </div>
+    </section>
+
+    <section id="examples" class="section">
+      <h2>2) Real-life examples</h2>
+
+      <ul>
+        <li><strong>Starting from rest:</strong> you need torque to overcome inertia and start moving.</li>
+        <li><strong>Going uphill / heavy load:</strong> you need more torque to keep the same speed.</li>
+        <li><strong>Holding constant speed:</strong> you adjust torque just enough to match the load.</li>
+        <li><strong>Braking:</strong> you apply negative torque to reduce speed.</li>
+      </ul>
+
+      <p class="note">
+        In electric vehicles, drones, robots, and industrial drives,
+        “good control” means the motor produces exactly the torque needed — not random maximum power.
+      </p>
+    </section>
+
+    <section id="link" class="section">
+      <h2>3) How this connects to SVM/FOC</h2>
+
+      <p>
+        To control torque and speed, we need to control the motor’s electrical behavior.
+        The key chain is:
+      </p>
+
+      <div class="note">
+        <strong>Torque</strong> comes from <strong>current</strong> → current is influenced by <strong>voltage</strong> → voltage is created by <strong>inverter switching + PWM</strong>.
+      </div>
+
+      <p>
+        Next, we answer the most important question:
+        <strong>why does current create torque?</strong>
+      </p>
+    </section>
+
+    <section id="next" class="section">
+      <h2>Next</h2>
+      <div class="nav-bottom">
+        <a href="/pieces-of-knowledge/pages/fundamentals/index.html">← Back to Fundamentals</a>
+        <a href="/pieces-of-knowledge/pages/fundamentals/f02-current-torque.html">Go to F02 →</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Comments</h2>
+      <div id="comments-embed"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© <span id="year"></span> Pieces of Knowledge</p></div>
+  </footer>
+
+  <script src="/pieces-of-knowledge/js/main.js"></script>
+</body>
+</html>

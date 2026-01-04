@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SVM 03 — Sector detection + mapping to switching states</title>
+  <meta name="description" content="SVM 03: how to detect the sector, choose the two neighbor vectors, and map them to inverter switching states like 100, 110, etc." />
+  <link rel="stylesheet" href="/pieces-of-knowledge/css/main.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/pieces-of-knowledge/">Pieces of Knowledge</a>
+      <nav class="nav">
+        <a href="/pieces-of-knowledge/pages/fundamentals/index.html">Fundamentals</a>
+        <a href="/pieces-of-knowledge/pages/foc/index.html">FOC</a>
+        <a href="/pieces-of-knowledge/pages/svm/index.html">SVM</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page">
+    <div class="breadcrumb">
+      <a href="/pieces-of-knowledge/">Home</a> →
+      <a href="/pieces-of-knowledge/pages/svm/index.html">SVM</a> →
+      SVM 03
+    </div>
+
+    <h1>SVM 03 — Sector detection + mapping to switching states</h1>
+
+    <p class="sub">
+      In SVM 02 we saw the “magic picture”: two neighbor corner vectors + a zero vector, timed by T1/T2/T0.
+      Now we answer the very practical question:
+      <strong>how do we know which two corners to use, and what do those corners mean inside the inverter switches?</strong>
+    </p>
+
+    <div class="toc">
+      <strong>On this page</strong>
+      <a href="#sector">1) Sector detection (which wedge am I in?)</a>
+      <a href="#neighbors">2) The two neighbors (Vx and Vy)</a>
+      <a href="#bits">3) Switch states (100, 110, …) explained simply</a>
+      <a href="#zero">4) Why two zero vectors (V0 and V7)</a>
+      <a href="#next">Next</a>
+    </div>
+
+    <section id="sector" class="section">
+      <h2>1) Sector detection (which wedge am I in?)</h2>
+
+      <p>
+        The SVM hexagon is split into 6 equal wedges (sectors), each 60° wide.
+        Your desired vector angle determines which sector you are currently in.
+      </p>
+
+      <div class="note">
+        <strong>Sector rule:</strong><br />
+        Sector 1: 0° .. 60°<br />
+        Sector 2: 60° .. 120°<br />
+        ...<br />
+        Sector 6: 300° .. 360°
+      </div>
+
+      <p>
+        So “sector detection” is basically:
+        <strong>which 60° slice contains my desired vector angle?</strong>
+      </p>
+
+      <p class="note">
+        If angle feels abstract, revisit:
+        <a href="/pieces-of-knowledge/pages/fundamentals/f07-ab-plane.html">F07 — αβ plane</a>.
+      </p>
+    </section>
+
+    <section id="neighbors" class="section">
+      <h2>2) The two neighbors (Vx and Vy)</h2>
+
+      <p>
+        Once you know the sector, the two corner vectors are fixed:
+        they are simply the two corners that form that sector.
+      </p>
+
+      <div class="note">
+        <strong>Example:</strong> if you are in Sector 1 (0°..60°), the two corners are V1 and V2.<br />
+        If you are in Sector 2 (60°..120°), the two corners are V2 and V3.<br />
+        And so on.
+      </div>
+
+      <p>
+        Then SVM chooses times T1 and T2 to “mix” these two corners so their average points to your desired vector.
+        (That was the SVM 02 diagram.)
+      </p>
+
+      <p class="note">
+        If T1/T2/T0 is still fuzzy, open:
+        <a href="/pieces-of-knowledge/pages/svm/svm-02.html">SVM 02</a>.
+      </p>
+    </section>
+
+    <section id="bits" class="section">
+      <h2>3) Switch states (100, 110, …) explained simply</h2>
+
+      <p>
+        The inverter has three phase outputs (A, B, C).
+        At any instant, each phase is connected either to +DC or to −DC (by the top/bottom switch).
+      </p>
+
+      <p>
+        A common way to describe this is with three bits:
+      </p>
+
+      <div class="note">
+        <strong>Switch state “abc”</strong><br />
+        a = 1 means phase A is connected to +DC (top switch ON)<br />
+        a = 0 means phase A is connected to −DC (bottom switch ON)<br />
+        Same for b (phase B) and c (phase C).
+      </div>
+
+      <p>
+        So:
+      </p>
+
+      <ul>
+        <li><strong>100</strong> means A is high (+DC), B low (−DC), C low (−DC).</li>
+        <li><strong>110</strong> means A high, B high, C low.</li>
+        <li><strong>010</strong> means A low, B high, C low.</li>
+        <li>… etc.</li>
+      </ul>
+
+      <p class="note">
+        These are not “random”.
+        They are the <strong>only</strong> instant voltage possibilities the inverter can create because it is built from ON/OFF switches.
+        (If this still feels new, read:
+        <a href="/pieces-of-knowledge/pages/fundamentals/f04-inverter-basics.html">F04 — inverter basics</a>.)
+      </p>
+
+      <p>
+        Each non-zero switch state corresponds to a corner vector in the hexagon.
+        Example mapping (common convention):
+      </p>
+
+      <div class="note">
+        V1 ↔ 100<br />
+        V2 ↔ 110<br />
+        V3 ↔ 010<br />
+        V4 ↔ 011<br />
+        V5 ↔ 001<br />
+        V6 ↔ 101
+      </div>
+
+      <p>
+        Don’t worry if you don’t memorize this now.
+        The important point is:
+        <strong>each corner is a real, physical switch pattern</strong>.
+      </p>
+    </section>
+
+    <section id="zero" class="section">
+      <h2>4) Why two zero vectors (V0 and V7)</h2>
+
+      <p>
+        There are two special switch states:
+      </p>
+
+      <ul>
+        <li><strong>000</strong> (all phases low)</li>
+        <li><strong>111</strong> (all phases high)</li>
+      </ul>
+
+      <p>
+        In both cases, the motor sees “no line-to-line voltage” from the inverter, so these are called <strong>zero vectors</strong>.
+        In SVM, we use a zero vector for time T0 to complete the PWM cycle.
+      </p>
+
+      <div class="note">
+        This is why many SVM sequences are written like:
+        V0 → Vx → Vy → V7 → Vy → Vx → V0
+      </div>
+    </section>
+
+    <section id="next" class="section">
+      <h2>Next</h2>
+
+      <p>
+        Next we can do one of two directions:
+      </p>
+      <ul>
+        <li><strong>Direction A (math-light):</strong> show sector detection + T1/T2 computation visually with a small interactive helper.</li>
+        <li><strong>Direction B (implementation):</strong> convert Vx/Vy/V0 timing into real PWM duties for the three phases.</li>
+      </ul>
+
+      <div class="nav-bottom">
+        <a href="/pieces-of-knowledge/pages/svm/svm-02.html">← Back to SVM 02</a>
+        <a href="/pieces-of-knowledge/pages/svm/index.html">Back to SVM index →</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Comments</h2>
+      <div id="comments-embed"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© <span id="year"></span> Pieces of Knowledge</p></div>
+  </footer>
+
+  <script src="/pieces-of-knowledge/js/main.js"></script>
+</body>
+</html>

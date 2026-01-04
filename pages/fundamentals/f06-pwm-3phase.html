@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>F06 — PWM in 3-phase (the rotating effect)</title>
+  <meta name="description" content="PWM in three phases: three averaged voltages combine to create a rotating electrical effect." />
+  <link rel="stylesheet" href="/pieces-of-knowledge/css/main.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/pieces-of-knowledge/">Pieces of Knowledge</a>
+      <nav class="nav">
+        <a href="/pieces-of-knowledge/pages/fundamentals/index.html">Fundamentals</a>
+        <a href="/pieces-of-knowledge/pages/foc/index.html">FOC</a>
+        <a href="/pieces-of-knowledge/pages/svm/index.html">SVM</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page">
+    <div class="breadcrumb">
+      <a href="/pieces-of-knowledge/">Home</a> →
+      <a href="/pieces-of-knowledge/pages/fundamentals/index.html">Fundamentals</a> →
+      F06
+    </div>
+
+    <h1>F06 — PWM in 3-phase (the rotating effect)</h1>
+
+    <p class="sub">
+      With one phase, PWM gives you an average voltage.
+      With three phases, the three averages can be arranged so the motor experiences a <strong>rotating electrical push</strong>.
+    </p>
+
+    <div class="toc">
+      <strong>On this page</strong>
+      <a href="#three">1) Three phase voltages</a>
+      <a href="#rotate">2) Why “rotation” appears</a>
+      <a href="#whyhard">3) Why three-phase PWM becomes tricky</a>
+      <a href="#lead">4) Why we need SVM</a>
+      <a href="#next">Next</a>
+    </div>
+
+    <section id="three" class="section">
+      <h2>1) Three phase voltages</h2>
+
+      <p>
+        A 3-phase motor has three windings (A, B, C).
+        The inverter produces three voltages (relative to the DC bus) using ON/OFF switches.
+        Using PWM, each phase can have a controllable <strong>average</strong> voltage.
+      </p>
+
+      <div class="note">
+        Beginner simplification:
+        We “shape” the average A/B/C voltages so the resulting electrical effect behaves like a smooth rotation.
+      </div>
+    </section>
+
+    <section id="rotate" class="section">
+      <h2>2) Why “rotation” appears</h2>
+
+      <p>
+        When A/B/C are coordinated properly, the combined magnetic effect in the stator behaves like a single vector that rotates.
+        That rotating effect is what pulls the rotor around.
+      </p>
+
+      <p class="note">
+        You do not need to memorize waveforms now.
+        Soon we will replace three signals (A, B, C) with one picture (the αβ plane).
+      </p>
+    </section>
+
+    <section id="whyhard" class="section">
+      <h2>3) Why three-phase PWM becomes tricky</h2>
+
+      <p>
+        In one phase, duty cycle directly sets an average.
+        In three phases, you must choose switching patterns that:
+      </p>
+
+      <ul>
+        <li>produce the desired 3-phase averages</li>
+        <li>stay within what the inverter can physically do</li>
+        <li>avoid ugly ripple and wasted voltage capability</li>
+      </ul>
+
+      <p>
+        This is where “smart modulation” comes in.
+      </p>
+    </section>
+
+    <section id="lead" class="section">
+      <h2>4) Why we need SVM</h2>
+
+      <p>
+        Space Vector Modulation (SVM) is the clean geometric method to do PWM in a 3-phase inverter.
+      </p>
+
+      <div class="note">
+        SVM lets us talk about “a desired voltage vector” instead of three separate waveforms,
+        and it uses a smart switching strategy to produce that vector efficiently.
+      </div>
+
+      <p>
+        Next page gives the key visualization tool: the αβ plane.
+      </p>
+    </section>
+
+    <section id="next" class="section">
+      <h2>Next</h2>
+      <div class="nav-bottom">
+        <a href="/pieces-of-knowledge/pages/fundamentals/f05-pwm-averaging.html">← Back to F05</a>
+        <a href="/pieces-of-knowledge/pages/fundamentals/f07-ab-plane.html">Go to F07 →</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Comments</h2>
+      <div id="comments-embed"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© <span id="year"></span> Pieces of Knowledge</p></div>
+  </footer>
+
+  <script src="/pieces-of-knowledge/js/main.js"></script>
+</body>
+</html>

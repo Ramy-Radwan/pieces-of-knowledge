@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fundamentals — Pieces of Knowledge</title>
-  <meta name="description" content="Fundamentals that support motor control: vectors, frames, 3-phase basics." />
+  <meta name="description" content="Fundamentals: the story bridge from speed/torque → inverter → PWM → αβ, preparing you for SVM and FOC." />
   <link rel="stylesheet" href="/pieces-of-knowledge/css/main.css" />
 </head>
 <body>
@@ -20,15 +20,51 @@
   </header>
 
   <main class="container page">
-    <div class="breadcrumb"><a href="/pieces-of-knowledge/">Home</a> → Fundamentals</div>
-    <h1>Fundamentals</h1>
-    <p class="sub">Short building blocks used by FOC and SVM pages.</p>
+    <div class="breadcrumb">
+      <a href="/pieces-of-knowledge/">Home</a> →
+      Fundamentals
+    </div>
+
+    <h1>Fundamentals — The story before SVM and FOC</h1>
+
+    <p class="sub">
+      Many tutorials jump straight into SVM or FOC and the beginner gets lost.
+      Here we build the chain step by step: what we want (speed/torque) → how motors create it (current)
+      → how we influence current (voltage) → what hardware can do (inverter ON/OFF)
+      → how ON/OFF becomes “analog” (PWM) → how we visualize it (αβ).
+    </p>
 
     <div class="toc">
-      <strong>Planned</strong>
-      <a href="#">Vectors in the αβ plane (coming soon)</a>
-      <a href="#">Reference frames (coming soon)</a>
+      <strong>Bridge mini-series</strong>
+      <a href="/pieces-of-knowledge/pages/fundamentals/f01-speed-torque.html">F01 — Speed vs Torque (the real goal)</a>
+      <a href="/pieces-of-knowledge/pages/fundamentals/f02-current-torque.html">F02 — Why current creates torque (push strength)</a>
+      <a href="/pieces-of-knowledge/pages/fundamentals/f03-voltage-job.html">F03 — Voltage’s job: how current changes</a>
+      <a href="/pieces-of-knowledge/pages/fundamentals/f04-inverter-basics.html">F04 — What is an inverter? (why 6 switches)</a>
+      <a href="/pieces-of-knowledge/pages/fundamentals/f05-pwm-averaging.html">F05 — PWM as averaging (1 phase)</a>
+      <a href="/pieces-of-knowledge/pages/fundamentals/f06-pwm-3phase.html">F06 — PWM in 3-phase (rotating effect)</a>
+      <a href="/pieces-of-knowledge/pages/fundamentals/f07-ab-plane.html">F07 — The αβ plane (one rotating vector)</a>
     </div>
+
+    <section class="section">
+      <h2>Where this leads</h2>
+      <p>
+        After these fundamentals:
+      </p>
+      <ul>
+        <li><strong>SVM</strong> becomes “obvious”: it is just a smart way to do PWM in a 3-phase inverter.</li>
+        <li><strong>FOC</strong> becomes “clear”: it is a control strategy that chooses the right rotating vector to get the torque you want.</li>
+      </ul>
+
+      <div class="nav-bottom">
+        <a href="/pieces-of-knowledge/pages/svm/index.html">Go to SVM series →</a>
+        <a href="/pieces-of-knowledge/pages/foc/index.html">Go to FOC series →</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Comments</h2>
+      <div id="comments-embed"></div>
+    </section>
   </main>
 
   <footer class="site-footer">
