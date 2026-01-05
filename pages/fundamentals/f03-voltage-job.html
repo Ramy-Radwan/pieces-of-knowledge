@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>F03 — Voltage’s job: how current changes</title>
-  <meta name="description" content="Voltage is what pushes current to change, and speed creates back-EMF that fights you." />
+  <meta name="description" content="Voltage is what pushes current to change. At speed, back-EMF fights you and consumes your voltage budget." />
   <link rel="stylesheet" href="/pieces-of-knowledge/css/main.css" />
 </head>
 <body>
@@ -29,14 +29,14 @@
     <h1>F03 — Voltage’s job: how current changes</h1>
 
     <p class="sub">
-      If torque is mostly about current, then the next question is:
+      Torque comes mostly from <strong>current</strong>. So the next question is:
       how do we influence current? The practical answer is: <strong>we apply voltage</strong>.
     </p>
 
     <div class="toc">
       <strong>On this page</strong>
       <a href="#push">1) Voltage “pushes” current</a>
-      <a href="#three">2) Three reasons you need voltage</a>
+      <a href="#budget">2) Voltage budget: where voltage gets “spent”</a>
       <a href="#speed">3) Why higher speed needs more voltage</a>
       <a href="#next">Next</a>
     </div>
@@ -45,8 +45,7 @@
       <h2>1) Voltage “pushes” current</h2>
 
       <p>
-        A motor phase winding is not just a wire.
-        Electrically, it behaves like:
+        A motor phase winding is not just a wire. Electrically, it behaves like:
       </p>
 
       <ul>
@@ -57,50 +56,62 @@
 
       <div class="note">
         <strong>Beginner takeaway:</strong><br />
-        Voltage is what gives you the ability to change current (and keep it at the level you want).
+        Voltage is the tool that lets you <strong>change current</strong> and <strong>hold it at the level you want</strong>.
       </div>
     </section>
 
-    <section id="three" class="section">
-      <h2>2) Three reasons you need voltage</h2>
+    <section id="budget" class="section">
+      <h2>2) Voltage budget: where voltage gets “spent”</h2>
 
       <p>
-        When you apply voltage, it is “spent” in three places:
+        When you apply voltage to a motor phase, that voltage is “spent” in three places:
       </p>
 
-      <ul>
-        <li><strong>R drop</strong>: part of voltage is used just to overcome resistance (heating loss).</li>
-        <li><strong>L drop</strong>: part of voltage is needed to change current quickly (dynamic behavior).</li>
-        <li><strong>Back-EMF</strong>: at speed, the motor generates a voltage that opposes you.</li>
-      </ul>
+      <ol>
+        <li>
+          <strong>Back-EMF (speed-related):</strong><br />
+          When the motor spins, it generates its own voltage. That generated voltage opposes your applied voltage.
+          Faster motor → larger back-EMF.
+        </li>
+        <li>
+          <strong>Resistance drop (I·R):</strong><br />
+          The copper windings have resistance. Current flowing through them causes a voltage drop.
+          More current (heavy load) → more voltage needed.
+        </li>
+        <li>
+          <strong>Inductive drop (L·dI/dt):</strong><br />
+          Inductance resists changes in current. If you want current to rise or fall quickly (fast torque change),
+          you need extra voltage for that “kick”.
+        </li>
+      </ol>
 
-      <p class="note">
-        We will later show the classic equation style (V = R·I + L·dI/dt + back-EMF),
-        but you do not need it yet. The idea is enough.
-      </p>
+      <div class="note">
+        <strong>One simple sentence to remember:</strong><br />
+        Required voltage is used to overcome <strong>back-EMF</strong> (speed), <strong>I·R</strong> (load current),
+        and <strong>L·dI/dt</strong> (fast current changes).
+      </div>
     </section>
 
     <section id="speed" class="section">
       <h2>3) Why higher speed needs more voltage</h2>
 
       <p>
-        At low speed, the motor generates only a small back-EMF.
-        So it is relatively easy to push current.
+        At low speed, back-EMF is small, so it’s relatively easy to push current.
       </p>
 
       <p>
-        At high speed, back-EMF becomes large.
-        It is like the motor is “pushing back” electrically.
+        At high speed, back-EMF becomes large. It is like the motor is “pushing back” electrically.
         To maintain the same current (and torque), you often need more applied voltage.
       </p>
 
       <div class="note">
-        This is one big reason why the <strong>voltage magnitude</strong> in SVM/FOC cannot always be “maximum” or “constant”.
-        It must adapt to speed and load.
+        This is why drives have a <strong>voltage limit</strong>.
+        When speed gets high enough, you can hit the voltage limit even if you still want more torque.
+        (We will explain that “voltage wall” and field weakening in <a href="/pieces-of-knowledge/pages/fundamentals/f08-limits-field-weakening.html">F08</a>.)
       </div>
 
       <p>
-        Next: how do we physically generate the voltages we want?
+        Next: if voltage is our tool, how do we physically generate it?
         That takes us to the inverter hardware.
       </p>
     </section>

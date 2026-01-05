@@ -30,7 +30,7 @@
 
     <p class="sub">
       The inverter cannot “dial” a voltage smoothly. It can only switch ON/OFF.
-      PWM is the trick that turns ON/OFF into a controllable <strong>average voltage</strong>.
+      PWM turns ON/OFF into a controllable <strong>average voltage</strong>.
     </p>
 
     <div class="toc">
@@ -39,6 +39,7 @@
       <a href="#idea">2) The idea: fast switching + averaging</a>
       <a href="#duty">3) Duty cycle (the simple knob)</a>
       <a href="#whyworks">4) Why the motor “feels” the average</a>
+      <a href="#speed">5) BLDC speed control (why speed is indirect)</a>
       <a href="#next">Next</a>
     </div>
 
@@ -56,7 +57,7 @@
 
       <p>
         But you might want something in the middle, like “half strength”.
-        The inverter cannot output half instantly. It can only output ON or OFF.
+        The inverter cannot output “half voltage” instantly. It can only output ON or OFF.
       </p>
     </section>
 
@@ -93,8 +94,7 @@
       </div>
 
       <p>
-        This is exactly why your SVM demo has a magnitude slider:
-        it represents “how much voltage” we want on average.
+        So duty cycle is basically a simple “voltage strength” knob.
       </p>
     </section>
 
@@ -106,16 +106,52 @@
       </p>
 
       <ul>
-        <li><strong>Inductance</strong> in the motor windings smooths current changes (current cannot jump instantly).</li>
-        <li><strong>Mechanical inertia</strong> smooths torque and speed (the rotor cannot jump instantly either).</li>
+        <li><strong>Inductance</strong> smooths current (current cannot jump instantly).</li>
+        <li><strong>Mechanical inertia</strong> smooths speed (the rotor cannot jump instantly).</li>
       </ul>
 
       <p class="note">
-        So even though the inverter output is “jumpy” instant-by-instant, the motor responds mostly to the short-time average.
+        So even though the inverter output is “jumpy”, the motor responds mostly to the short-time average.
+      </p>
+    </section>
+
+    <section id="speed" class="section">
+      <h2>5) BLDC speed control (why speed is indirect)</h2>
+
+      <p>
+        Here is the key beginner idea:
+        you do not “set speed” by applying a voltage and expecting a fixed RPM.
+        You control speed using a feedback loop that adjusts <strong>torque</strong>.
+      </p>
+
+      <div class="note">
+        <strong>Universal chain:</strong><br />
+        PWM duty ↑ → average voltage ↑ → current ↑ → torque ↑ → acceleration ↑ → speed ↑
+      </div>
+
+      <p>
+        In simple BLDC (6-step), you have two knobs:
+      </p>
+
+      <ol>
+        <li>
+          <strong>Commutation timing:</strong> decides which phase pair is energized (where the field points).
+          This makes the motor rotate properly.
+        </li>
+        <li>
+          <strong>PWM duty:</strong> decides how strong the voltage is (how hard you push).
+          This controls current → torque → acceleration.
+        </li>
+      </ol>
+
+      <p class="note">
+        <strong>Speed control loop:</strong><br />
+        Target speed → measure actual speed → too slow? increase duty → too fast? reduce duty.
+        This is why we say: <strong>speed is controlled indirectly by torque</strong>.
       </p>
 
       <p>
-        Next: how does this work with <strong>three phases</strong> — and why it creates a rotating effect?
+        Next we move from “one phase PWM” to “three phase PWM”.
       </p>
     </section>
 

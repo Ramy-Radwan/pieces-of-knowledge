@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>F08 — Limits and field weakening (the high-speed “voltage wall”)</title>
+  <meta name="description" content="Why you can't always increase voltage/current: current, voltage, thermal, and mechanical limits. Field weakening explained simply." />
+  <link rel="stylesheet" href="/pieces-of-knowledge/css/main.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/pieces-of-knowledge/">Pieces of Knowledge</a>
+      <nav class="nav">
+        <a href="/pieces-of-knowledge/pages/fundamentals/index.html">Fundamentals</a>
+        <a href="/pieces-of-knowledge/pages/foc/index.html">FOC</a>
+        <a href="/pieces-of-knowledge/pages/svm/index.html">SVM</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page">
+    <div class="breadcrumb">
+      <a href="/pieces-of-knowledge/">Home</a> →
+      <a href="/pieces-of-knowledge/pages/fundamentals/index.html">Fundamentals</a> →
+      F08
+    </div>
+
+    <h1>F08 — Limits and field weakening (the high-speed “voltage wall”)</h1>
+
+    <p class="sub">
+      In real motor drives you cannot “push harder forever”.
+      You hit limits: current, voltage, heating, and mechanics.
+      This page explains those limits and why <strong>field weakening</strong> exists at high speed.
+    </p>
+
+    <div class="toc">
+      <strong>On this page</strong>
+      <a href="#limits">1) The four limits (simple)</a>
+      <a href="#wall">2) The high-speed voltage wall</a>
+      <a href="#fw">3) Field weakening (why less torque can mean more top speed)</a>
+      <a href="#next">Next</a>
+    </div>
+
+    <section id="limits" class="section">
+      <h2>1) The four limits (simple)</h2>
+
+      <p>
+        A motor drive is always constrained by at least four limits:
+      </p>
+
+      <ol>
+        <li>
+          <strong>Current limit:</strong><br />
+          Too much current overheats windings and power electronics.
+          Controllers reduce voltage/duty (or reduce torque request) to keep current safe.
+        </li>
+        <li>
+          <strong>Voltage limit:</strong><br />
+          The inverter has a maximum voltage it can produce (set by the DC bus and switching).
+          In SVM, this appears as the hexagon boundary: you cannot command a voltage vector outside it.
+        </li>
+        <li>
+          <strong>Thermal limit:</strong><br />
+          Even if current is “allowed” for a short moment, you may not be allowed to hold it continuously.
+          Continuous torque is usually lower than peak torque.
+        </li>
+        <li>
+          <strong>Mechanical limit:</strong><br />
+          Bearings, rotor stress, vibration, and safety requirements limit maximum speed and torque.
+        </li>
+      </ol>
+
+      <div class="note">
+        <strong>Beginner takeaway:</strong><br />
+        “Maximum magnitude all the time” is not control — it’s how you hit limits quickly.
+      </div>
+    </section>
+
+    <section id="wall" class="section">
+      <h2>2) The high-speed voltage wall</h2>
+
+      <p>
+        At high speed, the motor generates a large <strong>back-EMF</strong>.
+        Back-EMF acts like an opposing voltage.
+      </p>
+
+      <p class="note">
+        Required voltage = back-EMF + I·R + L·dI/dt
+        <br />
+        As speed rises, back-EMF rises, so the required voltage rises.
+      </p>
+
+      <p>
+        Eventually you reach the inverter’s maximum available voltage.
+        That is the <strong>voltage wall</strong>.
+        Past this wall, you cannot increase voltage magnitude anymore even if you want more torque.
+      </p>
+    </section>
+
+    <section id="fw" class="section">
+      <h2>3) Field weakening (why less torque can mean more top speed)</h2>
+
+      <p>
+        This is the key confusion most beginners have:
+      </p>
+
+      <div class="note">
+        <strong>Below the voltage wall:</strong><br />
+        More torque → more acceleration → higher speed (over time). ✅
+      </div>
+
+      <div class="note">
+        <strong>At the voltage wall:</strong><br />
+        You are no longer limited by “how much torque you want”.<br />
+        You are limited by “you cannot apply more voltage”. 🚧
+      </div>
+
+      <p>
+        Back-EMF depends on speed and on the motor’s magnetic field strength (flux).
+        Stronger field → stronger back-EMF at the same speed.
+      </p>
+
+      <p>
+        So when you hit the voltage wall but still want higher speed, the controller can reduce flux.
+        That reduces back-EMF and frees voltage headroom, so the field can rotate faster.
+      </p>
+
+      <div class="note">
+        <strong>Trade-off:</strong><br />
+        Lower flux → lower torque capability (you can’t push as hard).<br />
+        But you can reach a higher <strong>top speed</strong> because you removed the voltage wall.
+      </div>
+
+      <p class="note">
+        Good mental model: field weakening is like shifting into a higher gear.
+        Higher possible speed, but less torque at the wheels.
+      </p>
+    </section>
+
+    <section id="next" class="section">
+      <h2>Next</h2>
+      <div class="nav-bottom">
+        <a href="/pieces-of-knowledge/pages/fundamentals/f07-ab-plane.html">← Back to F07</a>
+        <a href="/pieces-of-knowledge/pages/svm/svm-01.html">Go to SVM 01 →</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Comments</h2>
+      <div id="comments-embed"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© <span id="year"></span> Pieces of Knowledge</p></div>
+  </footer>
+
+  <script src="/pieces-of-knowledge/js/main.js"></script>
+</body>
+</html>
